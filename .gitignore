@@ -1,0 +1,37 @@
+# keep
+!settings.json
+!plugins/
+plugins/*
+!plugins/installed_plugins.json
+!plugins/known_marketplaces.json
+!plugins/claude-hud/
+plugins/claude-hud/*
+!plugins/claude-hud/config.json
+
+# ignore runtime/cache
+backups/
+cache/
+debug/
+file-history/
+sessions/
+history.jsonl
+shell-snapshots/
+statsig/
+todos/
+projects/
+plugins/install-counts-cache.json
+plugins/claude-hud/config-cache/
+plugins/claude-hud/transcript-cache/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# logs
+*.log
+
+# temp
+*.tmp
+
+# secrets
+.env

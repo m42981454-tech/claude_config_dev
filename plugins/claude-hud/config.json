@@ -1,0 +1,11 @@
+{
+  "language": "zh",
+  "display": {
+    "showTools": true,
+    "showAgents": true,
+    "showTodos": true,
+    "showDuration": true,
+    "showConfigCounts": true,
+    "showSessionName": true
+  }
+}

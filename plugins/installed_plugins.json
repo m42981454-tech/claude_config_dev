@@ -1,0 +1,34 @@
+{
+  "version": 2,
+  "plugins": {
+    "superpowers@claude-plugins-official": [
+      {
+        "scope": "user",
+        "installPath": "C:\\Users\\dev002\\.claude\\plugins\\cache\\claude-plugins-official\\superpowers\\5.0.7",
+        "version": "5.0.7",
+        "installedAt": "2026-04-13T14:20:31.380Z",
+        "lastUpdated": "2026-04-13T14:20:31.380Z",
+        "gitCommitSha": "917e5f53b16b115b70a3a355ed5f4993b9f8b73d"
+      }
+    ],
+    "claude-hud@claude-hud": [
+      {
+        "scope": "user",
+        "installPath": "C:\\Users\\dev002\\.claude\\plugins\\cache\\claude-hud\\claude-hud\\0.0.12",
+        "version": "0.0.12",
+        "installedAt": "2026-04-13T14:24:19.735Z",
+        "lastUpdated": "2026-04-13T14:24:19.735Z",
+        "gitCommitSha": "bfde7cfd9689faa35fca1aacb08960de3c837ffc"
+      }
+    ],
+    "skill-creator@claude-plugins-official": [
+      {
+        "scope": "user",
+        "installPath": "C:\\Users\\dev002\\.claude\\plugins\\cache\\claude-plugins-official\\skill-creator\\unknown",
+        "version": "unknown",
+        "installedAt": "2026-04-13T14:37:50.984Z",
+        "lastUpdated": "2026-04-13T14:37:50.984Z"
+      }
+    ]
+  }
+}
