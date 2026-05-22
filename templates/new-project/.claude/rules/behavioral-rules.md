@@ -21,7 +21,7 @@
 
 ---
 
-## 10. Engineering rules — Always invoke `karpathy-guidelines` skill
+<!-- ## 10. Engineering rules — Always invoke `karpathy-guidelines` skill
 
 **强制 trigger 时机**（来源:`~/.claude/skills/karpathy-guidelines/SKILL.md`,2026-05-18 加入）:
 
@@ -41,4 +41,4 @@
 
 **与 §2 团队编排的关系**:karpathy-guidelines 是 PM / Implementer / Reviewer / Tester 等**所有角色**共同行为基础。每个 sprint 派单稿默认隐含遵循 4 原则。**不冲突** — 4 原则与 §2 设计契合度 + 测试覆盖等 review 标准互补。
 
-**与 user-level CLAUDE.md 关系**:user-level 加了一份 cross-project 备忘;本节是项目级强制版(更明确 trigger 条件 + 派单融入)。
+**与 user-level CLAUDE.md 关系**:user-level 加了一份 cross-project 备忘;本节是项目级强制版(更明确 trigger 条件 + 派单融入)。 -->

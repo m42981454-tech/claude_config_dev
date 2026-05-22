@@ -5,6 +5,15 @@
 #   Line 3: subagent activity merged (alone)
 # Preserves ANSI color codes verbatim.
 
+# === Force UTF-8 encoding throughout (fixes CP932/CP936 mojibake on Windows) ===
+export LC_ALL=C.UTF-8
+export LANG=C.UTF-8
+export LC_CTYPE=C.UTF-8
+export PYTHONIOENCODING=utf-8
+export PYTHONUTF8=1
+# Windows cmd code page → UTF-8 (silent, fallback safe)
+command -v chcp.com >/dev/null 2>&1 && chcp.com 65001 >/dev/null 2>&1 || true
+
 input=$(cat)
 
 plugin_dir=$(ls -d "${CLAUDE_CONFIG_DIR:-$HOME/.claude}"/plugins/cache/claude-hud/claude-hud/*/ 2>/dev/null \
