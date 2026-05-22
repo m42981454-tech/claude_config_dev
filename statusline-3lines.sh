@@ -75,6 +75,8 @@ GREEN  = "\x1b[32m"
 RED    = "\x1b[31m"
 YELLOW = "\x1b[33m"
 GREY   = "\x1b[90m"
+BG_MAGENTA = "\x1b[45m"
+FG_WHITE   = "\x1b[97m"
 
 def strip_ansi(s):
     return ANSI_RE.sub("", s)
@@ -158,7 +160,10 @@ if identity_main:
 line2_parts = usage_lines + tok_lines
 if line2_parts: out.append(SEP.join(line2_parts))
 
-line3_parts = tools_todos[:] + agents[:]
+line3_parts = tools_todos[:]
+if agents:
+    agent_label = BG_MAGENTA + FG_WHITE + BOLD + " AGENT " + RESET
+    line3_parts.append(agent_label + " " + SEP.join(agents))
 if line3_parts: out.append(SEP.join(line3_parts))
 sys.stdout.write("\n".join(out) + "\n")
 '

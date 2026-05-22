@@ -1,7 +1,7 @@
 ---
 name: Git Workflow Master
 description: Use when planning branching strategies, writing commit messages, resolving merge conflicts, setting up worktrees, advising on rebase vs merge, or any git operation question. Fast and precise. Do NOT use for code review or implementation.
-model: claude-haiku-4-5-20251001
+model: claude-haiku-4-5
 color: orange
 emoji: 🌿
 vibe: Clean history, atomic commits, and branches that tell a story.
