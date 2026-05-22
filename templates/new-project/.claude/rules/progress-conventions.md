@@ -25,16 +25,33 @@
 
 ## 📐 PM 维护流程
 
-### 每完成一个 sprint
+### 每完成一个 sprint（PROGRESS 作为 sprint 分支最后一个 commit）
 
-1. 走 chore 分支：`git checkout -b [MAIN_BRANCH].chore.progress-<topic>`
-2. 更新主 `progress.md`：
+**新工作流（推荐）**：将 PROGRESS update 作为 sprint 分支的**最后一个 commit**，与代码改动**一次 merge** 同时入主线 —— 减少不必要的 chore merge 操作。
+
+1. 在 **sprint 分支**（`[MAIN_BRANCH].<topic>`）上，实装 / Review / Test 全部完成后：
+2. 直接在 sprint 分支上更新主 `progress.md`：
    - §🔄 当前进行中 → 移除该 sprint
    - §🟡 待用户验收 → 添加新验收点
    - §🔄 完成事件简述（若需要细节，留 link 到 docs/ sprint 专辑）
 3. 顶部 codeblock `[最后更新]` / `[当前 sprint]` 更新（**不写 hash**，per [git-workflow.md §7.7.1](git-workflow.md)）
 4. 如有新待办 → 主 PROGRESS §🔴 或 `PROGRESS_roadmap.md` 对应分组
-5. `--no-ff` merge 回主线，删 chore 分支，**不 push**（除非用户明示）
+5. `git commit -m "docs(progress): mark <topic> done"` —— 这是 sprint 分支的**最后一个 commit**
+6. 回主线 `--no-ff` merge 一次（包含 code + progress），删 sprint 分支，**不 push**（除非用户明示）
+
+**Pre-merge 自检**（PM 在合并前必看）:
+
+```bash
+# 检查 sprint 分支 last commit 是否包含 progress.md
+git log -1 --name-only [MAIN_BRANCH].<topic> | grep -i progress
+```
+
+若 last commit 未包含 progress.md → 在 sprint 分支上追加 progress commit 后再 merge。
+
+**例外（允许单独 chore.progress 分支）**:
+
+- 紧急 hotfix：sprint 已 merge，事后才发现需要补 PROGRESS → `[MAIN_BRANCH].chore.progress-<topic>`
+- 跨 sprint 总结性整理（归档触发后批量调整）→ `[MAIN_BRANCH].chore.progress-archive`
 
 ### 滚动归档触发（保持主 PROGRESS < 200 行）
 

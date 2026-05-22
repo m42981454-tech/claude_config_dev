@@ -238,4 +238,106 @@ Agent({
 })
 ```
 
-**Codebase Onboarding / Technical Writer / SRE / DevOps Automator / Database Optimizer / Incident Commander 派单**: 按需参照上述模式（subagent_type 用 Title Case，prompt 含上下文 + 任务 + 验收 + 输出格式）。
+**Codebase Onboarding 派单**（按需，陌生代码区）:
+
+```
+Agent({
+  description: "Map <module>",
+  subagent_type: "Codebase Onboarding Engineer",
+  prompt: "目标：画 <module> 架构图 + 模块责任 + 调用链路。
+           范围：（具体目录 / 文件 glob）。
+           输出：
+             1. 架构图（Mermaid / text）+ entry point
+             2. 主要 class / function 责任（file:line）
+             3. 调用链路：外部入口 → service → repo / model
+             4. 测试覆盖位置（对应 tests/<path>）
+           禁止：写代码；只 evidence-based 调查。"
+})
+```
+
+**Technical Writer 派单**（按需，文档密集）:
+
+```
+Agent({
+  description: "Write <docs>",
+  subagent_type: "Technical Writer",
+  prompt: "目标：写 <文档类型>：API doc / runbook / release notes / README / 迁移 guide。
+           范围：（文件路径 + 章节 + 关联代码 file:line）。
+           风格：对照既有 docs/ 风格（中文优先，英文反引号包代码）。
+           输出：具体 commit 内容 + 文件改动清单。"
+})
+```
+
+**SRE 派单**（按需，部署 / 监控 / SLO / 应急规划）:
+
+```
+Agent({
+  description: "SRE review <topic>",
+  subagent_type: "SRE (Site Reliability Engineer)",
+  prompt: "审查范围：docker-compose / Dockerfile / monitoring / migration / runbook。
+           SRE 5 标准：
+             1. Deployment 可重现：docker compose / Dockerfile / 依赖文件完整
+             2. Monitoring 覆盖：新功能 alert + dashboard panel + log 关键字
+             3. Rollback SOP：migration 有 down 路径；feature flag 切换路径清晰
+             4. 资源限制：memory/cpu limit 标注；db pool / redis 容量合理
+             5. Runbook 完整：故障场景 + 排查步骤 + 联系人（写进 runbook 文件）
+           输出：✅/⚠️/❌ 矩阵 + 建议 docker-compose / runbook diff"
+})
+```
+
+**DevOps Automator 派单**（按需，docker / CI/CD / monitoring 实装）:
+
+```
+Agent({
+  description: "DevOps automate <task>",
+  subagent_type: "DevOps Automator",
+  prompt: "目标：实装 docker-compose / Dockerfile / GitHub Action / Prometheus scrape / Grafana panel / alert rule / migration runbook 等。
+           范围：具体 file 列表。
+           风格：对照现有部署 / 监控配置模式。
+           完成后报告：文件清单 + 部署 smoke test 命令"
+})
+```
+
+**Database Optimizer 派单**（按需，DB 性能 / schema / migration）:
+
+```
+Agent({
+  description: "DB optimize <topic>",
+  subagent_type: "Database Optimizer",
+  prompt: "目标：DB 性能分析 / schema 优化 / 索引设计 / migration 影响评估。
+           范围：具体 SQL / migration / 慢 query 日志。
+           工具：EXPLAIN ANALYZE / pg_stat_statements 等 query plan 工具。
+           输出：索引 / 分表 / partition / cache 策略建议 + 风险评估"
+})
+```
+
+**Incident Commander 派单**（按需，生产事故 / postmortem）:
+
+```
+Agent({
+  description: "Incident respond <event>",
+  subagent_type: "Incident Response Commander",
+  prompt: "事故描述：（symptom / 影响范围 / 开始时间）。
+           可用证据：logs / metrics / traceback。
+           任务：
+             1. timeline 重构（发生 → 检测 → 缓解 → 恢复）
+             2. RCA 5 Whys / fishbone
+             3. action items（立刻 / 短期 / 长期）
+             4. runbook 改进点
+           输出：postmortem markdown + action items 优先级"
+})
+```
+
+**Product Manager 派单**（按需，sprint 启动期 — spec→task 拆解 / discovery / PRD / Now-Next-Later 路线图）:
+
+```
+Agent({
+  description: "[T#·ProductManager·Sprint·plan] <规划任务一句话>",
+  subagent_type: "Product Manager",
+  prompt: "上下文：...（需求来源 / design 章节 / PROGRESS §🔮 候选）。
+           任务：...（spec→可执行任务拆解 / discovery 综述 / PRD / Now-Next-Later 路线图 — 挑一）。
+           产出：结构化文档，每个任务 / 路线图项含 owner + 成功指标 + 时间窗。
+           禁止：替代主线 PM 决策（只产出建议，主线 Opus 拍板）；不写实现代码。
+           报告约定（ch4）：返回 message 第一行 `Agent: Product Manager ｜ Track: <T#> ｜ Sprint: <N#> ｜ Phase: plan ｜ Branch: <branch>`。"
+})
+```

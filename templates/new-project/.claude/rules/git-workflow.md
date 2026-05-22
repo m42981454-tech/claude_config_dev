@@ -111,31 +111,45 @@ git checkout -b [MAIN_BRANCH].ph<N>                 # 开子分支
 - 单个 chore 微 commit（如 `docs(typo)` / `chore(format)`）—— 除非引入新待办
 - sprint 内部多次 sub-merge（如 fix1 / fix2 同一 sprint 内的 polish）—— 在 sprint 整体 merge 时一并改
 
-**更新方式（强制流程）**:
+**更新方式（强制流程 — PROGRESS update 作为 sprint 分支的最后一个 commit）**:
 
 ```bash
-# 1. 走 chore 分支（不直接 commit 主线）
-git checkout [MAIN_BRANCH]
-git checkout -b [MAIN_BRANCH].chore.progress-ph<N>
+# 已在 sprint 分支 [MAIN_BRANCH].<topic> 上，实装 / Review / Test 全部完成
 
-# 2. 编辑 progress.md
-
-# 3. commit + 回主线 --no-ff merge + 删分支
+# 1. 在 sprint 分支末尾追加 PROGRESS update commit
 git add progress.md
-git commit -m "docs(progress): mark ph<N> done / 更新 PROGRESS"
+git commit -m "docs(progress): mark <topic> done / 更新 PROGRESS"
+
+# 2. 回主线一次性 merge（code + progress 原子合并）
 git checkout [MAIN_BRANCH]
-git merge --no-ff [MAIN_BRANCH].chore.progress-ph<N> -m "Merge progress update ph<N>"
-git branch -d [MAIN_BRANCH].chore.progress-ph<N>
+git merge --no-ff [MAIN_BRANCH].<topic> -m "Merge <topic>: <changes summary>"
+git branch -d [MAIN_BRANCH].<topic>
 ```
 
-**与 sprint merge 的关系**: sprint merge 与 PROGRESS update 是**两次独立 merge**（保证 sprint 改动与 PROGRESS 改动可分离 review / 可 bisect）。顺序：
+**与 sprint merge 的关系**: PROGRESS update 是 sprint 分支的**最后一个 commit**，与 sprint 改动**一次 merge** 同时入主线。
 
-1. 先 merge sprint 分支（实装 + 测试 + docs/ 设计文档）
-2. **紧接着**开 chore.progress-ph<N> 分支更新 progress.md
-3. merge chore 分支
-4. 两次都不 push
+**顺序**:
 
-**强制性**: sprint merge 后**必须**立刻做 PROGRESS update —— 不允许累积多个 sprint 后再批量更新（违反单一真相源原则）。
+1. sprint 分支跑实装 + Review + Test（每阶段独立 commit）
+2. 全部通过后，**在 sprint 分支上**做 `docs(progress): ...` commit 更新 progress.md
+3. 一次 `--no-ff` merge 回主线（包含所有 code + progress 改动）
+4. 不 push（除非用户明示）
+
+**强制性**: progress.md 必须在**该 sprint 分支的最后一个 commit** 更新 —— 不允许在 merge 后单独做 chore.progress 分支（减少不必要的 merge 操作）；不允许累积多个 sprint 后再批量更新（违反单一真相源原则）。
+
+**例外**（极少数情况允许 sprint merge 后单独 chore.progress 分支）:
+
+- 紧急 hotfix：sprint 已 merge，事后发现需要补 PROGRESS 一条 → 用 `[MAIN_BRANCH].chore.progress-<topic>` 补一次
+- 跨 sprint 总结性 PROGRESS 调整（如归档触发后批量整理）→ 用 `[MAIN_BRANCH].chore.progress-archive` 走一次
+
+**Pre-merge 自检清单（PM 在 sprint 合并前必看）**:
+
+- [ ] sprint 分支 last commit 是否包含 `progress.md`？（`git log -1 --name-only` 检查）
+- [ ] 顶部 codeblock `[最后更新]` / `[当前 sprint]` / `[burning]` 是否已更新？
+- [ ] §🔄 进行中 → 是否已移出该 sprint？
+- [ ] §🟡 待验收 → 是否已添加新验收点？
+
+若有任一未做 → 在 sprint 分支上追加 commit 后再 merge。
 
 ### 7.7.1 PROGRESS.md 描述边界
 

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
-  "_comment": "Project-level Claude Code hooks (template). 主线分支与 PROGRESS 路径通过 git/gh CLI 自动检测；如自动检测失败，把 [MAIN_BRANCH] 与 [PROGRESS_PATH] 改成项目实际值。",
+  "_comment": "Project-level Claude Code hooks (template). 主线分支与 PROGRESS 路径通过 git/gh CLI 自动检测；如自动检测失败，把 [PROGRESS_PATH] 改成项目实际值。",
   "hooks": {
     "PreToolUse": [
       {
@@ -12,16 +12,26 @@
             "command": "INPUT=$(cat); CMD=$(echo \"$INPUT\" | jq -r '.tool_input.command // \"\"'); if echo \"$CMD\" | grep -qE '^[[:space:]]*(echo|printf|cat[[:space:]]+<<)'; then echo '{}'; exit 0; fi; if echo \"$CMD\" | grep -qE '\\bgit[[:space:]]+(commit|push|merge|rebase|stash|tag|cherry-pick|am|revert)\\b.*(--no-verify|--no-gpg-sign|-c[[:space:]]+commit\\.gpgsign=false)\\b'; then echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\"},\"systemMessage\":\"BLOCKED: git hook bypass forbidden. Investigate root cause.\"}'; exit 0; fi; MAIN_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's|refs/remotes/origin/||' || echo main); if echo \"$CMD\" | grep -qE \"git[[:space:]]+push.*-f.*\\\\b(main|$MAIN_BRANCH)\\\\b\"; then echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\"},\"systemMessage\":\"BLOCKED: force-push to main branch forbidden.\"}'; exit 0; fi; if echo \"$CMD\" | grep -qE 'rm[[:space:]]+-rf[[:space:]]+[^[:space:]]*(\\.claude|docs|migrations)'; then echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\"},\"systemMessage\":\"BLOCKED: rm -rf protected dirs (.claude/docs/migrations).\"}'; exit 0; fi; if echo \"$CMD\" | grep -qE 'git[[:space:]]+(checkout|merge|rebase|reset)\\b.*\\|[[:space:]]*(tail|head|awk)\\b'; then echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\"},\"systemMessage\":\"BLOCKED: chained pipe with git checkout/merge eats fatal exit code. Use independent Bash calls.\"}'; exit 0; fi; echo '{}'; exit 0"
           }
         ]
-      }
-    ],
-    "PostToolUse": [
+      },
       {
-        "_comment": "H2 — sprint merge 后提醒 PROGRESS sync",
+        "_comment": "H2-pre — sprint merge 前检查：sprint 分支 last commit 是否触及 progress.md（新工作流：progress update 应作为 sprint 分支最后一个 commit）。未触及则警告（不 deny，允许 design-only 等场景）。",
         "matcher": "Bash",
         "hooks": [
           {
             "type": "command",
-            "command": "INPUT=$(cat); CMD=$(echo \"$INPUT\" | jq -r '.tool_input.command // \"\"'); MAIN_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's|refs/remotes/origin/||' || echo main); if echo \"$CMD\" | grep -qE \"git[[:space:]]+merge[[:space:]]+--no-ff[[:space:]]+$MAIN_BRANCH\\\\.\"; then echo '{\"systemMessage\":\"sprint merge detected. Next: update PROGRESS.md (per .claude/rules/progress-conventions.md).\"}'; exit 0; fi; echo '{}'; exit 0"
+            "command": "INPUT=$(cat); CMD=$(echo \"$INPUT\" | jq -r '.tool_input.command // \"\"'); MAIN_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's|refs/remotes/origin/||' || echo main); if echo \"$CMD\" | grep -qE \"git[[:space:]]+merge[[:space:]]+--no-ff[[:space:]]+$MAIN_BRANCH\\\\.\"; then SPRINT_BRANCH=$(echo \"$CMD\" | grep -oE \"$MAIN_BRANCH\\\\.[^[:space:]\\\"']+\" | head -1); if [ -n \"$SPRINT_BRANCH\" ]; then LAST_FILES=$(git log -1 --name-only --pretty=format: \"$SPRINT_BRANCH\" 2>/dev/null | grep -v '^$'); if ! echo \"$LAST_FILES\" | grep -qiE '(^|/)progress\\.md$'; then echo '{\"systemMessage\":\"⚠️ Pre-merge check: sprint branch '\"'\"'\"$SPRINT_BRANCH\"'\"'\"' last commit does not touch progress.md. Per workflow: update progress.md as the FINAL commit on sprint branch before merging. Continue if intentional (e.g. design-only sprint or chore branch).\"}'; exit 0; fi; fi; fi; echo '{}'; exit 0"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "_comment": "H2-post — sprint merge 后兜底：若 merge commit 未触及 progress.md（pre 检查被跳过 / sprint 分支没更新就 merge 了），提示开 chore.progress 补救（per progress-conventions.md 例外条款）",
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "INPUT=$(cat); CMD=$(echo \"$INPUT\" | jq -r '.tool_input.command // \"\"'); MAIN_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's|refs/remotes/origin/||' || echo main); if echo \"$CMD\" | grep -qE \"git[[:space:]]+merge[[:space:]]+--no-ff[[:space:]]+$MAIN_BRANCH\\\\.\"; then LAST_FILES=$(git log -1 --name-only --pretty=format: HEAD 2>/dev/null | grep -v '^$'); if ! echo \"$LAST_FILES\" | grep -qiE '(^|/)progress\\.md$'; then echo '{\"systemMessage\":\"⚠️ Merge done but does not include progress.md update. Open chore.progress branch to补救 (per progress-conventions.md 例外条款).\"}'; exit 0; fi; fi; echo '{}'; exit 0"
           }
         ]
       }
