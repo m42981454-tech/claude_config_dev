@@ -3,7 +3,7 @@
 import sys, re, os, json
 from collections import deque
 from pathlib import Path
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 sys.stdin.reconfigure(encoding="utf-8", newline="\n")
 sys.stdout.reconfigure(encoding="utf-8", newline="\n")
 
@@ -124,6 +124,30 @@ def colorize_git(s):
     s = re.sub(r"(\"[^\"]+" + "…" + r"?\")", DIM + r"\1" + RESET, s)
     return s
 
+def reset_label_from_usage(text):
+    """Return reset time from a HUD weekly remaining-time string."""
+    match = re.search(r"\(([^)]*?)/\s*Week\)", text)
+    if not match:
+        return ""
+
+    delta_parts = {"days": 0, "hours": 0, "minutes": 0, "seconds": 0}
+    for value, unit in re.findall(r"(\d+)\s*([dhms])", match.group(1)):
+        if unit == "d":
+            delta_parts["days"] += int(value)
+        elif unit == "h":
+            delta_parts["hours"] += int(value)
+        elif unit == "m":
+            delta_parts["minutes"] += int(value)
+        elif unit == "s":
+            delta_parts["seconds"] += int(value)
+
+    delta = timedelta(**delta_parts)
+    if delta <= timedelta(0):
+        return ""
+
+    reset_at = datetime.now().astimezone() + delta
+    return reset_at.strftime("%m/%d %H:%M")
+
 identity, tools_todos, agents = [], [], []
 state = "identity"
 last_bucket = None
@@ -155,9 +179,6 @@ for raw_line in sys.stdin.read().splitlines():
         else:
             identity.append(raw_line)
 
-reset_conf = Path.home() / ".claude" / "reset-date.conf"
-reset_date = reset_conf.read_text().strip() if reset_conf.exists() else ""
-
 tok_lines, usage_lines, identity_main = [], [], []
 for item in identity:
     plain_item = strip_ansi(item)
@@ -169,14 +190,15 @@ for item in identity:
     else:
         identity_main.append(item)
 
-if reset_date and usage_lines:
-    new_usage = []
-    for item in usage_lines:
-        plain_item = strip_ansi(item)
-        if "Week" in plain_item:
-            item = item.rstrip() + " →" + reset_date
-        new_usage.append(item)
-    usage_lines = new_usage
+new_usage = []
+for item in usage_lines:
+    plain_item = strip_ansi(item)
+    if "Week" in plain_item:
+        reset_label = reset_label_from_usage(plain_item)
+        if reset_label:
+            item = item.rstrip() + " →" + reset_label
+    new_usage.append(item)
+usage_lines = new_usage
 
 git_suffix = colorize_git(os.environ.get("GIT_INFO", "").strip())
 if git_suffix:
@@ -207,4 +229,4 @@ if active_name:
 line3_parts.extend(tools_todos)
 
 if line3_parts: out.append(SEP.join(line3_parts))
-sys.stdout.write("\n".join(out) + "\n")
+sys.stdout.write("\n".join(out) + "\n")

@@ -14,11 +14,11 @@
     "skill-creator@claude-plugins-official": [
       {
         "scope": "user",
-        "installPath": "C:\\Users\\dev002\\.claude\\plugins\\cache\\claude-plugins-official\\skill-creator\\4d077674b344",
-        "version": "4d077674b344",
+        "installPath": "C:\\Users\\dev002\\.claude\\plugins\\cache\\claude-plugins-official\\skill-creator\\331b3536cd39",
+        "version": "331b3536cd39",
         "installedAt": "2026-04-13T14:37:50.984Z",
-        "lastUpdated": "2026-05-22T15:45:11.895Z",
-        "gitCommitSha": "4d077674b344cef19bb9e66a53ad699bc663e19f"
+        "lastUpdated": "2026-05-22T20:23:00.129Z",
+        "gitCommitSha": "331b3536cd390437200b33e134afee45c4102785"
       }
     ],
     "andrej-karpathy-skills@karpathy-skills": [
@@ -34,21 +34,21 @@
     "frontend-design@claude-plugins-official": [
       {
         "scope": "user",
-        "installPath": "C:\\Users\\dev002\\.claude\\plugins\\cache\\claude-plugins-official\\frontend-design\\4d077674b344",
-        "version": "4d077674b344",
+        "installPath": "C:\\Users\\dev002\\.claude\\plugins\\cache\\claude-plugins-official\\frontend-design\\331b3536cd39",
+        "version": "331b3536cd39",
         "installedAt": "2026-05-20T02:43:13.933Z",
-        "lastUpdated": "2026-05-22T15:45:11.904Z",
-        "gitCommitSha": "4d077674b344cef19bb9e66a53ad699bc663e19f"
+        "lastUpdated": "2026-05-22T20:23:00.141Z",
+        "gitCommitSha": "331b3536cd390437200b33e134afee45c4102785"
       }
     ],
     "context7@claude-plugins-official": [
       {
         "scope": "user",
-        "installPath": "C:\\Users\\dev002\\.claude\\plugins\\cache\\claude-plugins-official\\context7\\4d077674b344",
-        "version": "4d077674b344",
+        "installPath": "C:\\Users\\dev002\\.claude\\plugins\\cache\\claude-plugins-official\\context7\\331b3536cd39",
+        "version": "331b3536cd39",
         "installedAt": "2026-05-20T02:43:21.614Z",
-        "lastUpdated": "2026-05-22T15:45:11.908Z",
-        "gitCommitSha": "4d077674b344cef19bb9e66a53ad699bc663e19f"
+        "lastUpdated": "2026-05-22T20:23:00.146Z",
+        "gitCommitSha": "331b3536cd390437200b33e134afee45c4102785"
       }
     ],
     "claude-md-management@claude-plugins-official": [
@@ -64,11 +64,11 @@
     "plugin-dev@claude-plugins-official": [
       {
         "scope": "user",
-        "installPath": "C:\\Users\\dev002\\.claude\\plugins\\cache\\claude-plugins-official\\plugin-dev\\4d077674b344",
-        "version": "4d077674b344",
+        "installPath": "C:\\Users\\dev002\\.claude\\plugins\\cache\\claude-plugins-official\\plugin-dev\\331b3536cd39",
+        "version": "331b3536cd39",
         "installedAt": "2026-05-20T02:43:54.904Z",
-        "lastUpdated": "2026-05-22T15:45:11.899Z",
-        "gitCommitSha": "4d077674b344cef19bb9e66a53ad699bc663e19f"
+        "lastUpdated": "2026-05-22T20:23:00.135Z",
+        "gitCommitSha": "331b3536cd390437200b33e134afee45c4102785"
       }
     ]
   }
