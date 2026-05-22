@@ -5,9 +5,9 @@ allowed-tools: Bash, Agent, Read, Grep, Glob
 
 # /cr
 
-启动并发 code review:Code Reviewer + API Tester + Evidence Collector + Security Engineer + Reality Checker + (按需 Database Optimizer / SRE)同时跑。
+启动并发 code review：Code Reviewer + API Tester + Evidence Collector + Security Engineer + Reality Checker + (按需 Database Optimizer / SRE) 同时跑。
 
-借鉴 zircote/.claude `/cr` 命令模式 + 适配项目 §2.5 触发决策表。
+模式借鉴社区 `/cr` 命令实践 + 适配项目 §2.5 触发决策表。
 
 ## Usage
 
@@ -17,7 +17,7 @@ allowed-tools: Bash, Agent, Read, Grep, Glob
 /cr <commit-hash>          # 审单 commit
 ```
 
-## 派单矩阵(per §2.5)
+## 派单矩阵（per §2.5）
 
 按 sprint 范围选择 ✓ 启动的 specialist:
 
@@ -32,9 +32,9 @@ allowed-tools: Bash, Agent, Read, Grep, Glob
 
 ## 并发约束
 
-- 并发 ≤ 5 agent(per §2.6)
-- 同消息内多个 `Agent` tool call(并行启动)
-- 必经双签:Code Reviewer + Tester
+- 并发 ≤ 5 agent（per §2.6）
+- 同消息内多个 `Agent` tool call（并行启动）
+- 必经双签：Code Reviewer + Tester
 - 按需追加签字 ❌ → 阻断 merge
 
 ## 关联

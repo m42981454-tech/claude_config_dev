@@ -1,13 +1,13 @@
 ---
-description: 派 sub-agent 干 sprint 工作(13 angle agent 决策表 + 4 channel 强制)
+description: 派 sub-agent 干 sprint 工作（13 angle agent 决策表 + 4 channel 强制）
 allowed-tools: Bash, Skill, Agent
 ---
 
 # /sprint:dispatch
 
-派 plugin sub-agent 显式入口(Backend Architect / Code Reviewer / API Tester / Security Engineer / 等 13 个角色)。
+派 plugin sub-agent 显式入口（Backend Architect / Code Reviewer / API Tester / Security Engineer / 等 13 个角色）。
 
-**调用 skill `my-dispatch-sprint`**(`disable-model-invocation: true`,只能显式 invoke,防误派)。
+**调用 skill `my-dispatch-sprint`**（`disable-model-invocation: true`，只能显式 invoke，防误派）。
 
 ## Usage
 
@@ -21,7 +21,7 @@ allowed-tools: Bash, Skill, Agent
 /sprint:dispatch fix <bug>            # 派 Minimal Change Engineer
 ```
 
-## 4 Channel 强制(每个 dispatch 必含)
+## 4 Channel 强制（每个 dispatch 必含）
 
 | Ch | 位置 | 格式 |
 |---|---|---|
@@ -32,7 +32,7 @@ allowed-tools: Bash, Skill, Agent
 
 ## $ARGUMENTS
 
-接受参数:`<role> <task描述>`。
+接受参数：`<role> <task描述>`。
 
 ## 关联
 
