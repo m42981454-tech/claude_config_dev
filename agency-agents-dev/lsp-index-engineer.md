@@ -1,5 +1,5 @@
 ---
-name: LSP/Index Engineer
+name: lsp-index-engineer
 description: Language Server Protocol specialist building unified code intelligence systems through LSP client orchestration and semantic indexing
 model: sonnet
 color: orange

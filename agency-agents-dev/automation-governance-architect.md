@@ -1,5 +1,5 @@
 ---
-name: Automation Governance Architect
+name: automation-governance-architect
 description: Governance-first architect for business automations (n8n-first) who audits value, risk, and maintainability before implementation.
 model: sonnet
 emoji: ⚙️

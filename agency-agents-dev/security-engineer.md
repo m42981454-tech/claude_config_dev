@@ -1,5 +1,5 @@
 ---
-name: Security Engineer
+name: security-engineer
 description: Expert application security engineer specializing in threat modeling, vulnerability assessment, secure code review, security architecture design, and incident response for modern web, API, and cloud-native applications.
 model: sonnet
 color: red

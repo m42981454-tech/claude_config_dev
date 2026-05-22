@@ -1,5 +1,5 @@
 ---
-name: SRE (Site Reliability Engineer)
+name: sre-site-reliability-engineer
 description: Expert site reliability engineer specializing in SLOs, error budgets, observability, chaos engineering, and toil reduction for production systems at scale.
 model: sonnet
 color: "#e63946"

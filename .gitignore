@@ -59,3 +59,4 @@ plugins/plugin-catalog-cache.json
 
 # nested git repos (manage separately)
 agency-agents-reference/
+mcp-needs-auth-cache.json
