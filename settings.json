@@ -31,6 +31,14 @@
             "command": "printf '【post-compact reminder】\\n1) 不直接 commit 主线 — 所有改动开子分支 (feature/dev/jin.demo.<topic>)，merge 用 --no-ff\\n2) verification-before-completion — 真跑命令再宣告完成，evidence > claims\\n3) progress.md 是任务状态唯一真相源 — 不确定上下文时先 cat progress.md\\n4) 重输出派 subagent — 长日志/批量调研不要装进主会话\\n'"
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_CONFIG_DIR:-$HOME/.claude}/scripts/agent-loader.sh\""
+          }
+        ]
       }
     ]
   },
