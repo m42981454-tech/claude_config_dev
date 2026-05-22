@@ -31,8 +31,8 @@
 
 ## 2. 技术栈（概述）
 
-- **后端**：[BACKEND_STACK]（详见 [`.claude/rules/backend.md`](./.claude/rules/backend.md)，工作在 `[backend-dir]/` 时自动加载）
-- **前端**：[FRONTEND_STACK]（详见 [`.claude/rules/frontend.md`](./.claude/rules/frontend.md)，工作在 `[frontend-dir]/` 时自动加载）
+- **后端**：[BACKEND_STACK]（详见 [`.claude/rules/stack-backend.md`](./.claude/rules/stack-backend.md)，工作在 `[backend-dir]/` 时自动加载）
+- **前端**：[FRONTEND_STACK]（详见 [`.claude/rules/stack-frontend.md`](./.claude/rules/stack-frontend.md)，工作在 `[frontend-dir]/` 时自动加载）
 - **基础设施**：[INFRA]
 
 ---
@@ -169,7 +169,7 @@ Agent({
 
 > Model 在 agent frontmatter 已定，调用时不必再指定（临时 override 加 `model:` 参数）。
 
-完整派单模板（含 Security / Reality Checker / SRE / DevOps / DBOpt / Incident Commander / Product Manager 等）→ [`.claude/rules/team-orchestration.md §2.7`](./.claude/rules/team-orchestration.md)。
+完整派单模板（含 Security / Reality Checker / SRE / DevOps / DBOpt / Incident Commander / Product Manager 等）→ 调用 `Skill("my-dispatch-templates")` 按需加载。
 
 ---
 
@@ -188,7 +188,7 @@ Agent({
 - 不删除既有测试，不用 `@pytest.mark.skip` 或 `test.skip` 绕过失败
 - 影响共享契约 / 路由 / API client / UI shell 的变更，必须扩大验证范围
 - E2E 浏览器验证时，console 无 error 循环才算通过
-- 具体命令：后端见 [`.claude/rules/backend.md`](./.claude/rules/backend.md)，前端见 [`.claude/rules/frontend.md`](./.claude/rules/frontend.md)
+- 具体命令：后端见 [`.claude/rules/stack-backend.md`](./.claude/rules/stack-backend.md)，前端见 [`.claude/rules/stack-frontend.md`](./.claude/rules/stack-frontend.md)
 
 ---
 
@@ -228,6 +228,7 @@ Agent({
 |---|---|
 | `my-start-sprint` | "启动 P0-X" / "启动 sprint X" / "启动 ph<N>" — 7 步 SOP |
 | `my-dispatch-sprint` | 显式派单（`disable-model-invocation: true`）— 13 agent 决策表 |
+| `my-dispatch-templates` | 各角色完整 Agent({}) 派单模板（按需加载，节省 baseline token）|
 | `my-issue-first-gate` | 开 sprint 子分支前必先 `gh issue create` |
 | `my-pm-progress-sync` | progress.md 更新（新工作流：作为 sprint 分支 last commit）|
 | `my-postmortem` | 事故复盘 8 段标准结构 |
@@ -263,14 +264,15 @@ Agent({
 |---|---|---|
 | [`engineering.md`](./.claude/rules/engineering.md) | 每会话 | karpathy 4 原则（强制 trigger 时机 + 速查）|
 | [`behavioral-rules.md`](./.claude/rules/behavioral-rules.md) | 每会话 | DON'T 清单 + karpathy §10 联动 |
-| [`team-orchestration.md`](./.claude/rules/team-orchestration.md) | 每会话 | 派单决策表 + 13 模板 + 4 channel |
+| [`team-orchestration.md`](./.claude/rules/team-orchestration.md) | 每会话 | 派单决策表 + 4 channel（模板移至 skill `my-dispatch-templates`）|
 | [`git-workflow.md`](./.claude/rules/git-workflow.md) | 每会话 | 子分支 / merge / chained-pipe 防御 / Issue-First gate |
-| [`progress-conventions.md`](./.claude/rules/progress-conventions.md) | 每会话 | PROGRESS 三件套 + 滚动归档 + 维护时机 |
+| [`progress-conventions.md`](./.claude/rules/progress-conventions.md) | **path-scoped** `progress.md` / `PROGRESS*.md` | PROGRESS 三件套 + 滚动归档 + 维护时机 |
 | [`architecture-policies.md`](./.claude/rules/architecture-policies.md) | 每会话 | 架构政策（source of truth，偏离需 decision doc）|
-| [`skill-promotion-path.md`](./.claude/rules/skill-promotion-path.md) | 每会话 | skill 三阶段晋升 + 占位符变量表 |
+| [`skill-promotion-path.md`](./.claude/rules/skill-promotion-path.md) | **path-scoped** `.claude/skills/**` | skill 三阶段晋升 + 占位符变量表 |
 | [`docs-conventions.md`](./.claude/rules/docs-conventions.md) | **path-scoped** `docs/**/*.md` | docs/ 命名 + 月份归档 + frontmatter |
-| [`backend.md`](./.claude/rules/backend.md) | **path-scoped** `[backend-dir]/**` | 后端技术栈 + 测试命令 + 约定 |
-| [`frontend.md`](./.claude/rules/frontend.md) | **path-scoped** `[frontend-dir]/**` | 前端技术栈 + 测试命令 + 约定 |
+| [`stack-backend.md`](./.claude/rules/stack-backend.md) | **path-scoped** `[backend-dir]/**` | 后端技术栈 + 测试命令 + 约定（初始化时填写占位符）|
+| [`stack-frontend.md`](./.claude/rules/stack-frontend.md) | **path-scoped** `[frontend-dir]/**` | 前端技术栈 + 测试命令 + 约定（初始化时填写占位符）|
+| [`README.md`](./.claude/rules/README.md) | **path-scoped** `.claude/rules/**` | 本目录所有规则文件的索引 + 加载机制说明 |
 | `dev-commands.md`（**按需创建**）| — | docker compose / 测试 / type-check / 迁移 等 |
 
 ---

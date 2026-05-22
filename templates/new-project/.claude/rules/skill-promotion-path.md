@@ -1,6 +1,11 @@
+---
+paths:
+  - ".claude/skills/**"
+---
+
 # Skill 晋升路径（Skill Promotion Path）
 
-> **加载**: 每会话（无 `paths:` frontmatter）
+> **加载**: path-scoped（仅在读写 `.claude/skills/` 下文件时载入，不进 session baseline）
 > **目的**: 规范化"项目级 skill → user-level skill → plugin"三阶段晋升，实现真通配工程
 
 ---

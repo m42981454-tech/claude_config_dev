@@ -1,6 +1,12 @@
+---
+paths:
+  - "progress.md"
+  - "PROGRESS*.md"
+---
+
 # PROGRESS / 文档维护规约 + 关键索引
 
-> **加载**: 每会话（无 `paths:` frontmatter，与 `.claude/rules/` 其他 sub-file 同 baseline）
+> **加载**: path-scoped（仅在读写 `progress.md` / `PROGRESS*.md` 时载入，不进 session baseline）
 > **核心理念**: PROGRESS 三件套——主文件 + done 归档 + roadmap，按生命周期分层
 
 ---
