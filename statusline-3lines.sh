@@ -54,12 +54,16 @@ if git -C "$PWD" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
     GIT_INFO="${GIT_INFO} (${_total} commits) ${_hash} ${_time} \"${_msg}…\""
 fi
 
+export TRANSCRIPT_PATH
+TRANSCRIPT_PATH=$(echo "$input" | jq -r '.transcript_path // ""' 2>/dev/null || echo "")
+
 export PYTHONIOENCODING=utf-8
 export PYTHONUTF8=1
 printf '%s' "$input" | /c/nvm4w/nodejs/node "${plugin_dir}dist/index.js" \
   | /c/Users/dev002/miniconda3/python -c '
-import sys, re, os
+import sys, re, os, json
 from pathlib import Path
+from datetime import datetime, timezone
 sys.stdin.reconfigure(encoding="utf-8", newline="\n")
 sys.stdout.reconfigure(encoding="utf-8", newline="\n")
 
@@ -78,13 +82,13 @@ GREY   = "\x1b[90m"
 FG_WHITE   = "\x1b[97m"
 
 AGENT_BG = {
-    "cyan":   "\x1b[46m",
-    "blue":   "\x1b[44m",
-    "purple": "\x1b[45m",
-    "orange": "\x1b[43m",
-    "slate":  "\x1b[100m",
-    "red":    "\x1b[41m",
-    "green":  "\x1b[42m",
+    "cyan":   "\x1b[106m",   # bright cyan
+    "blue":   "\x1b[104m",   # bright blue
+    "purple": "\x1b[105m",   # bright magenta
+    "orange": "\x1b[103m",   # bright yellow
+    "slate":  "\x1b[100m",   # bright black (dark gray)
+    "red":    "\x1b[101m",   # bright red
+    "green":  "\x1b[102m",   # bright green
 }
 AGENT_KEYWORDS = {
     "orchestrator":   "cyan",
@@ -95,14 +99,76 @@ AGENT_KEYWORDS = {
     "minimal":        "slate",
     "project manager":"blue",
     "reality":        "red",
+    "security":       "red",
+    "tester":         "green",
+    "api tester":     "green",
+    "evidence":       "green",
+    "sre":            "orange",
+    "devops":         "orange",
+    "incident":       "red",
+    "database":       "blue",
+    "ai engineer":    "purple",
+    "data engineer":  "purple",
 }
 
 def agent_bg_color(text):
     t = text.lower()
     for kw, color in AGENT_KEYWORDS.items():
         if kw in t:
-            return AGENT_BG.get(color, "\x1b[45m")
-    return "\x1b[45m"
+            return AGENT_BG.get(color, "\x1b[105m")
+    return "\x1b[105m"
+
+def read_active_agent_from_transcript():
+    """Return (name, elapsed_seconds) of active agent, or (None, 0)."""
+    path = os.environ.get("TRANSCRIPT_PATH", "")
+    if not path or not Path(path).exists():
+        return None, 0
+    try:
+        with open(path, encoding="utf-8") as f:
+            lines = f.readlines()[-300:]
+    except Exception:
+        return None, 0
+    pending = {}     # tool_use_id -> (subagent_type, ts_str)
+    completed = set()
+    for ln in lines:
+        try:
+            evt = json.loads(ln)
+        except Exception:
+            continue
+        msg = evt.get("message", {})
+        if not isinstance(msg, dict):
+            continue
+        content = msg.get("content", [])
+        if not isinstance(content, list):
+            continue
+        for c in content:
+            if not isinstance(c, dict):
+                continue
+            ctype = c.get("type")
+            if ctype == "tool_use" and c.get("name") in ("Task", "Agent"):
+                tu_id = c.get("id")
+                inp = c.get("input", {}) or {}
+                subagent = inp.get("subagent_type") or inp.get("description") or "Agent"
+                if tu_id:
+                    pending[tu_id] = (subagent, evt.get("timestamp", ""))
+            elif ctype == "tool_result":
+                tu_id = c.get("tool_use_id")
+                if tu_id:
+                    completed.add(tu_id)
+    # Find most recent pending Task
+    actives = [(tu_id, sub, ts) for tu_id, (sub, ts) in pending.items() if tu_id not in completed]
+    if not actives:
+        return None, 0
+    actives.sort(key=lambda x: x[2], reverse=True)
+    _, sub, ts = actives[0]
+    elapsed = 0
+    if ts:
+        try:
+            start = datetime.fromisoformat(ts.replace("Z", "+00:00"))
+            elapsed = int((datetime.now(timezone.utc) - start).total_seconds())
+        except Exception:
+            pass
+    return sub, elapsed
 
 def strip_ansi(s):
     return ANSI_RE.sub("", s)
@@ -186,12 +252,24 @@ if identity_main:
 line2_parts = usage_lines + tok_lines
 if line2_parts: out.append(SEP.join(line2_parts))
 
-line3_parts = tools_todos[:]
+line3_parts = []
+
+# Transcript-based active agent detection (independent of claude-hud output)
+active_name, active_elapsed = read_active_agent_from_transcript()
+if active_name:
+    bg = agent_bg_color(active_name)
+    elapsed_str = f" [{active_elapsed}s]" if active_elapsed > 0 else ""
+    agent_block = f"{bg}{FG_WHITE}{BOLD}  ⚡ AGENT: {active_name}{elapsed_str} ⚡  {RESET}"
+    line3_parts.append(agent_block)
+
+# Existing claude-hud-derived activity (tools_todos / agents bucket)
+line3_parts.extend(tools_todos)
 if agents:
     agent_text = SEP.join(agents)
     bg = agent_bg_color(strip_ansi(agent_text))
     agent_label = bg + FG_WHITE + BOLD + " AGENT " + RESET
     line3_parts.append(agent_label + " " + agent_text)
+
 if line3_parts: out.append(SEP.join(line3_parts))
 sys.stdout.write("\n".join(out) + "\n")
 '
