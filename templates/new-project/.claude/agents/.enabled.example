@@ -9,32 +9,37 @@
 # 可用 agent 清单（44 个）查询:
 #   ls <agent-dev-pool>/
 #
-# 已经在 L2 全局加载的（无需在此添加）:
-#   project-manager-senior, agents-orchestrator, backend-architect, frontend-developer,
-#   code-reviewer, reality-checker, minimal-change-engineer, git-workflow-master
+# 已经在 L2 用户级全局加载的（无需在此添加）:
+#   project-manager-senior, code-reviewer, minimal-change-engineer, git-workflow-master
 #
-# L3 模板默认只保留项目模板专属 agent（已在本目录文件存在，无需在此添加）:
-#   project-management-jira-workflow-steward
+# L3 模板默认 agent（已在本目录文件存在，无需在此添加）:
+#   agents-orchestrator, backend-architect, frontend-developer,
+#   reality-checker, project-management-jira-workflow-steward
 
-# === L2 全局默认角色覆盖范围: 已自动可用，无需取消注释 ===
+# === L2 用户级默认角色覆盖范围: 已自动可用，无需取消注释 ===
 # 说明：以下“推定来源 / 覆盖参考”来自 reference 目录角色职责对照，不是 agent 文件中的显式血缘字段。
 #
 # project-manager-senior       # 推定来源 / 覆盖参考：project-manager-senior、product-manager、project-shepherd、studio-producer
 #                              # 覆盖内容：需求拆解、范围控制、任务列表、验收标准和多角色协调
+# code-reviewer                # 推定来源 / 覆盖参考：engineering-code-reviewer、security-engineer、senior-developer
+#                              # 覆盖内容：代码审查、PR 审计、正确性、安全性、可维护性和性能反馈
+# minimal-change-engineer      # 推定来源 / 覆盖参考：engineering-minimal-change-engineer、senior-developer、git-workflow-master
+#                              # 覆盖内容：最小改动修复、热修、配置调整和避免顺手扩大范围
+# git-workflow-master          # 推定来源 / 覆盖参考：engineering-git-workflow-master、project-management-jira-workflow-steward
+#                              # 覆盖内容：分支策略、提交信息、合并冲突、worktree 和 Git 操作建议
+#
+# === L3 模板默认角色覆盖范围: 新项目默认可用，无需取消注释 ===
+#
 # agents-orchestrator          # 推定来源 / 覆盖参考：agents-orchestrator、workflow-architect、workflow-optimizer、automation-governance-architect
 #                              # 覆盖内容：多 agent 流水线、复杂多阶段项目、开发到验收的流程编排
 # backend-architect            # 推定来源 / 覆盖参考：engineering-backend-architect、software-architect、backend-architect-with-memory
 #                              # 覆盖内容：后端架构、接口设计、数据库结构、认证、微服务和云基础设施
 # frontend-developer           # 推定来源 / 覆盖参考：engineering-frontend-developer、design-ux-architect、xr-interface-architect
 #                              # 覆盖内容：前端页面、组件、浏览器逻辑、样式、动效、性能和基础无障碍
-# code-reviewer                # 推定来源 / 覆盖参考：engineering-code-reviewer、security-engineer、senior-developer
-#                              # 覆盖内容：代码审查、PR 审计、正确性、安全性、可维护性和性能反馈
 # reality-checker              # 推定来源 / 覆盖参考：testing-reality-checker、testing-evidence-collector、testing-test-results-analyzer
 #                              # 覆盖内容：完成度复核、生产就绪检查、证据验证和防止虚假通过
-# minimal-change-engineer      # 推定来源 / 覆盖参考：engineering-minimal-change-engineer、senior-developer、git-workflow-master
-#                              # 覆盖内容：最小改动修复、热修、配置调整和避免顺手扩大范围
-# git-workflow-master          # 推定来源 / 覆盖参考：engineering-git-workflow-master、project-management-jira-workflow-steward
-#                              # 覆盖内容：分支策略、提交信息、合并冲突、worktree 和 Git 操作建议
+# project-management-jira-workflow-steward # 推定来源 / 覆盖参考：project-management-jira-workflow-steward
+#                              # 覆盖内容：Jira-linked git workflow、issue-first、分支和进度联动
 #
 # === 共享池完整索引: 按项目需要取消注释 ===
 #

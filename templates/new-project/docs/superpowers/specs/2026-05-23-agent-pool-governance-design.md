@@ -144,21 +144,21 @@ Report the copied files, removed template placeholders, and remaining TODOs.
 - `<agent-dev-pool>` 下新增了 `AGENT_RULES.md` 维护规则。
 - `<agent-dev-pool>` 里的 44 个 agent 已完成 `name == filename stem` 标准化。
 - 全局默认模型和 effort 已从高消耗默认值调整为更保守的默认值。
-- `<global-claude-config>/agents` 下的 8 个全局默认 agents 已完成 `name == filename stem` 标准化。
+- `<global-claude-config>/agents` 下的 8 个全局默认 agents 已完成 `name == filename stem` 标准化；随后其中 4 个开发项目默认角色已下沉到 new-project template。
 - loader 已调整为 project-local agent 优先：项目本地同名文件存在时，不再因为共享池缺失而报告 missing。
 - new-project template 曾内置的 11 个 agents 已完成 `name == filename stem` 标准化。
-- new-project template 已进一步清理重复/近重复 agent：模板本地仅保留项目模板专属 agent，其余通过 `.enabled.example` 从 `<agent-dev-pool>` 按需启用。
+- new-project template 已进一步清理重复/近重复 agent：模板本地保留开发项目默认角色和项目模板专属 agent，其余通过 `.enabled.example` 从 `<agent-dev-pool>` 按需启用。
 - new-project template 的 `.enabled.example` 和 `CLAUDE.md` 已同步为 kebab-case agent ID、推荐测试角色和按需加载说明。
 
 ## new-project agent 补位评估
 
 本次重新对照了三层 agent 配置：
 
-- L2 全局默认 8 个：覆盖 PM、编排、后端、前端、代码审查、现实复核、最小变更和 Git 工作流。
-- L3 new-project 模板默认 1 个：只保留项目模板专属的 `project-management-jira-workflow-steward`。
+- L2 用户级默认 4 个：覆盖 PM、代码审查、最小变更和 Git 工作流。
+- L3 new-project 模板默认 5 个：覆盖多 agent 编排、后端、前端、现实复核，以及项目模板专属的 `project-management-jira-workflow-steward`。
 - L1.5 dev 专家池 44 个：作为按需启用来源，不应全量复制进项目模板。
 
-结论：模板内不应保留和 L1.5 dev 专家池重复/近重复的 agent 文件。为了避免默认上下文重新变重，本阶段把通用专家都放进 `.enabled.example` 推荐清单；项目确实需要时由 loader 从 `<agent-dev-pool>` 复制，只有项目专属或覆盖共享池行为的 agent 才放进 `.claude/agents/`。
+结论：模板内不应保留和 L1.5 dev 专家池重复/近重复的 agent 文件；但开发项目高频默认角色可以放在 new-project template 中，而不是长期放在用户级全局目录。这样用户级默认上下文更轻，新项目仍能保留完整开发工作流。
 
 推荐按需启用角色：
 
@@ -197,7 +197,7 @@ Report the copied files, removed template placeholders, and remaining TODOs.
 - `templates/new-project/.claude/agents/.enabled.example`
 - `templates/new-project/CLAUDE.md`
 
-设计原则保持不变：模板内置角色要少而稳定，项目差异通过 `.enabled` 从 `<agent-dev-pool>` 复制；只有当某个角色是模板自身的专属约定，或需要覆盖共享池行为时，才放进 L3 项目本地 agent 目录。
+设计原则保持不变：用户级只保留跨项目高频基础角色；new-project template 保留开发项目默认角色；项目差异通过 `.enabled` 从 `<agent-dev-pool>` 复制；只有当某个角色是模板默认工作流、模板自身专属约定，或需要覆盖共享池行为时，才放进 L3 项目本地 agent 目录。
 
 ## Claude Code 配置稳妥瘦身方案完成度
 
@@ -225,10 +225,12 @@ Report the copied files, removed template placeholders, and remaining TODOs.
    - 已新增 `<agent-dev-pool>/AGENT_RULES.md` 作为后续新增 agent 的维护规则。
 6. 全局默认 agents metadata 标准化：
    - `<global-claude-config>/agents` 中 8 个默认 agents 已完成 `name == filename stem`。
+   - 其中 `agents-orchestrator`、`backend-architect`、`frontend-developer`、`reality-checker` 已下沉到 new-project template，用户级保留 4 个更通用的基础 agent。
 7. loader hygiene 初步处理：
    - project-local-only agent 已可通过本地同名文件避免 missing 噪音。
 8. new-project template 一致性：
-   - 模板本地 agent 已从 11 个清理为 1 个项目专属 agent。
+   - 模板本地 agent 已从 11 个重复/近重复 agent 清理后，调整为 5 个项目默认 agent。
+   - 模板默认保留 `agents-orchestrator`、`backend-architect`、`frontend-developer`、`reality-checker`、`project-management-jira-workflow-steward`。
    - 重复/近重复的通用专家已从模板本地 agent 目录移除，改由 `.enabled.example` 按需启用。
    - `.enabled.example` 已改为 kebab-case agent ID 示例，并补充测试、性能、可访问性、证据采集等推荐角色。
    - 模板 `CLAUDE.md` 中的 agent 表格、动态加载示例、派单示例和测试类 agent 覆盖判断已同步到新策略。
@@ -240,6 +242,7 @@ Report the copied files, removed template placeholders, and remaining TODOs.
 - 项目本地 settings 文件未再被 git tracking。
 - `<agent-dev-pool>` 中 agent `name` 不合规项为 0。
 - `<global-claude-config>/agents` 中 agent `name` 不合规项为 0。
+- new-project template 默认 agent `name` 不合规项为 0。
 - new-project template 内置 agents 的 `name` 不合规项为 0。
 - 相关文档不包含固定本机路径。
 
@@ -262,7 +265,7 @@ Report the copied files, removed template placeholders, and remaining TODOs.
 - 项目 `.enabled` 行为已记录。
 - 项目本地覆盖行为已记录。
 - 新项目模板中已保留本设计履历。
-- 全局默认 agents 已完成 metadata 标准化。
+- 全局默认 agents 已完成 metadata 标准化，并已下沉 4 个开发项目默认角色到 new-project template。
 - loader 已支持 project-local-only agent 不产生共享池 missing 噪音。
 
 未完成：
@@ -293,7 +296,7 @@ Report the copied files, removed template placeholders, and remaining TODOs.
 
 ## L2 基础 agent 二阶段瘦身设计
 
-本阶段重新评估了 `<global-claude-config>/agents` 下 8 个用户级默认 agent 与 `<agent-reference-root>/testing`、`<agent-dev-pool>` 的关系。
+本阶段重新评估了 `<global-claude-config>/agents` 下 8 个用户级默认 agent 与 `<agent-reference-root>/testing`、`<agent-dev-pool>` 的关系，并已执行第一轮下沉。
 
 关键结论：
 
@@ -313,21 +316,29 @@ Report the copied files, removed template placeholders, and remaining TODOs.
    - `reality-checker`：作为最终证据闸门，要求或复核专项 agent 的证据，缺失则判定 `NEEDS WORK`。
    - `minimal-change-engineer`：发现跨域风险时记录 follow-up，不扩大当前最小修复范围。
    - `git-workflow-master`：只管理 Git 边界，不用 Git 操作绕过质量闸门。
+3. 已把 4 个开发项目默认角色从用户级下沉到 new-project template：
+   - `agents-orchestrator`
+   - `backend-architect`
+   - `frontend-developer`
+   - `reality-checker`
+4. 用户级全局目录当前保留 4 个更通用的基础角色：
+   - `project-manager-senior`
+   - `code-reviewer`
+   - `minimal-change-engineer`
+   - `git-workflow-master`
 
-推荐后续迁移方向：
+当前分层结果：
 
 | 层级 | 建议保留/下沉 | 理由 |
 |---|---|---|
-| 用户级最小默认 | `minimal-change-engineer`、`git-workflow-master`、`code-reviewer` | 这三类在大多数会话中都有通用价值，且能约束改动、提交和审查质量 |
-| 用户级可选保留 | `project-manager-senior` | 如果日常经常从需求拆解开始，可以保留；否则可下沉到项目模板 |
-| 项目模板默认候选 | `agents-orchestrator`、`backend-architect`、`frontend-developer`、`reality-checker` | 更像开发项目默认工作流角色，不一定适合所有 Claude Code 会话 |
+| 用户级默认 | `project-manager-senior`、`minimal-change-engineer`、`git-workflow-master`、`code-reviewer` | 跨项目、跨任务高频；用于规划、最小改动、Git 和审查基础能力 |
+| 项目模板默认 | `agents-orchestrator`、`backend-architect`、`frontend-developer`、`reality-checker`、`project-management-jira-workflow-steward` | 更像开发项目工作流角色；放入模板后，新项目可用，但普通用户级会话不再默认加载 |
 | 项目按需启用 | `api-tester`、`security-engineer`、`evidence-collector`、`performance-benchmarker`、`accessibility-auditor` 等 | 专项能力强，但默认加载会增加上下文和工具面 |
 
-迁移原则：
+后续迁移原则：
 
-- 不要一次性移动或删除用户级 8 个 agent。
-- 先观察边界补强后的实际使用效果。
-- 如果默认上下文仍然过重，再把“项目模板默认候选”复制到 `<new-project-template>/.claude/agents/`，并从用户级目录移除。
+- 先观察用户级 4 个 + 模板默认 5 个的实际使用效果。
+- 如果用户级默认上下文仍然过重，再评估是否把 `project-manager-senior` 也下沉到 new-project template。
 - 用户级只保留最通用、跨项目、跨任务都成立的角色。
 
 ## Claude Code 额度耗尽时的离线手顺

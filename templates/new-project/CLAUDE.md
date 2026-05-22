@@ -65,30 +65,30 @@ L2   <global-claude-config>/agents/       8 个     全局 baseline（任何项�
 L3   <project>/.claude/agents/            按项目    项目专属 agent + 本地覆盖
 ```
 
-### L2 全局基础工具箱（任何项目都加载，从用户级 `<global-claude-config>/agents`）
+### L2 用户级基础工具箱（任何项目都加载，从用户级 `<global-claude-config>/agents`）
 
 | Agent ID | Model | 触发场景 |
 |---|---|---|
 | **project-manager-senior** | opus | 需求拆解、任务规划 |
-| **agents-orchestrator** | sonnet | 多 agent 流水线协调 |
-| **backend-architect** | sonnet | 后端 API / 服务架构 / 数据库 |
-| **frontend-developer** | sonnet | React / Vue / CSS / 组件 |
 | **code-reviewer** | sonnet | 每 sprint 必经审查 |
-| **reality-checker** | sonnet | release readiness / GA 前复核 |
 | **minimal-change-engineer** | haiku | bug fix / 小修小补 |
 | **git-workflow-master** | haiku | git 操作 / 分支策略 |
 
-### L3 项目专项（本项目模板默认 1 个，从 `.claude/agents/` 加载）
+### L3 项目默认角色（本项目模板默认 5 个，从 `.claude/agents/` 加载）
 
 | Agent ID | Model | 触发场景 |
 |---|---|---|
+| **agents-orchestrator** | sonnet | 多 agent 流水线协调 |
+| **backend-architect** | sonnet | 后端 API / 服务架构 / 数据库 |
+| **frontend-developer** | sonnet | React / Vue / CSS / 组件 |
+| **reality-checker** | sonnet | release readiness / GA 前复核 |
 | **project-management-jira-workflow-steward** | opus | Jira-linked git workflow |
 
-模板目录不再内置可从 `<agent-dev-pool>` 取得的重复 agent。通用专家通过 `.enabled` 按需复制，项目确实需要覆盖共享池行为时，才在 `.claude/agents/` 放同名本地版本。
+模板目录保留开发项目常用默认角色；可从 `<agent-dev-pool>` 取得的专项专家仍通过 `.enabled` 按需复制。项目确实需要覆盖共享池行为时，才在 `.claude/agents/` 放同名本地版本。
 
 ### 推荐补位角色（从 L1.5 池按需启用）
 
-L2 全局角色覆盖 PM、编排、后端、前端、代码审查、现实复核、最小变更和 Git。其他专家从 L1.5 dev 池按需启用，不默认全量加载，避免把上下文和工具面重新撑大。
+L2 用户级角色覆盖 PM、代码审查、最小变更和 Git；L3 模板角色覆盖编排、后端、前端、现实复核和 Jira-linked workflow。其他专家从 L1.5 dev 池按需启用，不默认全量加载，避免把上下文和工具面重新撑大。
 
 | Agent ID | 建议启用时机 |
 |---|---|
