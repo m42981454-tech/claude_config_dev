@@ -2,8 +2,6 @@
 !settings.json
 !plugins/
 plugins/*
-!plugins/installed_plugins.json
-!plugins/known_marketplaces.json
 !plugins/claude-hud/
 plugins/claude-hud/*
 !plugins/claude-hud/config.json
@@ -35,3 +33,29 @@ Thumbs.db
 
 # secrets
 .env
+.credentials.json
+
+# session / runtime state
+.last-cleanup
+reset-date.conf
+session-env/
+session-memory/
+sessions/
+tasks/
+plans/
+telemetry/
+ide/
+downloads/
+
+# plugin runtime / cache
+plugins/cache/
+plugins/data/
+plugins/marketplaces/
+plugins/plugin-catalog-cache.json
+
+# backup files
+*.bak
+
+# nested git repos (manage separately)
+agency-agents-reference/
+mcp-needs-auth-cache.json

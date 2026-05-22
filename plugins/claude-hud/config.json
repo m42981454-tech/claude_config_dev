@@ -1,11 +1,25 @@
 {
   "language": "zh",
+  "lineLayout": "compact",
+  "showSeparators": false,
   "display": {
     "showTools": true,
     "showAgents": true,
     "showTodos": true,
+    "showProject": false,
+    "showConfigCounts": false,
+    "showTokenBreakdown": false,
+    "showSpeed": false,
+    "showUsage": true,
+    "usageBarEnabled": true,
     "showDuration": true,
-    "showConfigCounts": true,
-    "showSessionName": true
+    "showSessionName": true,
+    "showSessionTokens": true
+  },
+  "gitStatus": {
+    "enabled": true,
+    "showDirty": true,
+    "showAheadBehind": true,
+    "showFileStats": false
   }
 }
