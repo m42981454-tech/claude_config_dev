@@ -1,2 +1,21 @@
-# local session learning records
+# Local Claude Code configuration
+settings.local.json
+
+# Project-specific agent activation
+agents/.enabled
+
+# Local session learning records
 session-memory/
+
+# Runtime caches and generated state
+cache/
+logs/
+tmp/
+temp/
+*.log
+*.tmp
+*.stackdump
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
