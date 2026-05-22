@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "_comment": "Project-level Claude Code hooks. Trimmed 6→3 in chore.hook-trim-and-verify (refs retrospective). Per .claude/rules/git-workflow.md §7.7.2 + behavioral-rules.md §8.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "_comment": "H1 — 拦危险 Bash cmd(per behavioral-rules §8 + git-workflow §7.2/§7.5.1). Skip echo/printf/cat heredoc 防 false positive on test scripts.",
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "INPUT=$(cat); CMD=$(echo \"$INPUT\" | jq -r '.tool_input.command // \"\"'); if echo \"$CMD\" | grep -qE '^[[:space:]]*(echo|printf|cat[[:space:]]+<<)'; then echo '{}'; exit 0; fi; if echo \"$CMD\" | grep -qE '\\bgit[[:space:]]+(commit|push|merge|rebase|stash|tag|cherry-pick|am|revert)\\b.*(--no-verify|--no-gpg-sign|-c[[:space:]]+commit\\.gpgsign=false)\\b'; then echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\"},\"systemMessage\":\"BLOCKED: git hook bypass forbidden (per §7.2). Investigate root cause.\"}'; exit 0; fi; if echo \"$CMD\" | grep -qE 'git[[:space:]]+push.*-f.*\\b(main|feature/dev)\\b'; then echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\"},\"systemMessage\":\"BLOCKED: force-push to main/feature/dev forbidden (per §7.2).\"}'; exit 0; fi; if echo \"$CMD\" | grep -qE 'rm[[:space:]]+-rf[[:space:]]+[^[:space:]]*(\\.claude|docs|database/migrations)'; then echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\"},\"systemMessage\":\"BLOCKED: rm -rf protected dirs (.claude/docs/migrations).\"}'; exit 0; fi; if echo \"$CMD\" | grep -qE 'git[[:space:]]+(checkout|merge|rebase|reset)\\b.*\\|[[:space:]]*(tail|head|awk)\\b'; then echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\"},\"systemMessage\":\"BLOCKED: chained pipe with git checkout/merge eats fatal exit code (per §7.5.1). Use independent Bash calls.\"}'; exit 0; fi; echo '{}'; exit 0"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "_comment": "H2 — sprint merge 后提醒 PROGRESS sync(per §7.7)",
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "INPUT=$(cat); CMD=$(echo \"$INPUT\" | jq -r '.tool_input.command // \"\"'); if echo \"$CMD\" | grep -qE 'git[[:space:]]+merge[[:space:]]+--no-ff[[:space:]]+feature/dev\\.'; then echo '{\"systemMessage\":\"sprint merge detected. Next: invoke skill my-pm-progress-sync or run /sprint:sync to update PROGRESS.md (per §7.7).\"}'; exit 0; fi; echo '{}'; exit 0"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "_comment": "H6 — 会话起 work state 摘要 + PROGRESS 行数检查(吸收原 H5 PreCompact 价值)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd \"$(git rev-parse --show-toplevel 2>/dev/null || pwd)\" 2>/dev/null; BRANCH=$(git branch --show-current 2>/dev/null || echo unknown); LAST3=$(git log --oneline -3 2>/dev/null | head -3 | tr '\\n' '|' | sed 's/|$//'); AHEAD=$(git rev-list --count origin/feature/dev..HEAD 2>/dev/null || echo 0); PROGRESS_PATH=\"20260403/plan1a-kong/PROGRESS.md\"; LINES=$(wc -l < \"$PROGRESS_PATH\" 2>/dev/null || echo 0); OPEN=$(gh issue list --state open --repo m42981454-tech/doc 2>/dev/null | wc -l || echo 0); WARN=\"\"; if [ \"$LINES\" -gt 250 ]; then WARN=\" | ⚠️ PROGRESS $LINES lines > 250 — invoke /sprint:sync 归档\"; fi; echo \"{\\\"systemMessage\\\":\\\"Branch: $BRANCH | ahead $AHEAD | open issues: $OPEN | PROGRESS: $LINES lines$WARN | last: $LAST3\\\"}\"; exit 0"
+          }
+        ]
+      }
+    ]
+  }
+}
