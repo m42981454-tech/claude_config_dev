@@ -1,12 +1,51 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(git -C d:\\\\projects\\\\dev\\\\webdemo202508 log --oneline -20)",
+      "Bash(dir \"d:\\\\projects\\\\dev\\\\webdemo202508\" /b)",
+      "Bash(git checkout *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git merge *)",
+      "Bash(git branch *)",
+      "Skill(superpowers:brainstorming)",
+      "Skill(superpowers:brainstorming:*)",
+      "Bash(Get-ChildItem -Path \"d:\\\\projects\\\\dev\\\\webdemo202508\" -Directory)",
+      "Bash(Select-Object Name)",
+      "Bash(curl -s http://localhost:8000/api/v1/content/blocks/page/home)",
+      "PowerShell(claude plugins marketplace add https://github.com/msitarzewski/agency-agents 2>&1)",
+      "PowerShell($tmpDir = \"$env:TEMP\\\\agency-agents-inspect\"; if \\(Test-Path $tmpDir\\) { Remove-Item $tmpDir -Recurse -Force }; git clone --depth 1 https://github.com/msitarzewski/agency-agents $tmpDir 2>&1; Get-ChildItem $tmpDir | Select-Object Name, Mode)",
+      "PowerShell(Get-ChildItem \"$env:TEMP\\\\agency-agents-inspect\" -Recurse | Select-Object FullName)",
+      "Bash(Get-Date)"
+    ],
+    "defaultMode": "bypassPermissions"
+  },
+  "model": "opus",
   "statusLine": {
     "type": "command",
-    "command": "bash -c 'plugin_dir=$(ls -d \"${CLAUDE_CONFIG_DIR:-$HOME/.claude}\"/plugins/cache/claude-hud/claude-hud/*/ 2>/dev/null | awk -F/ '\"'\"'{ print $(NF-1) \"\\t\" $(0) }'\"'\"' | sort -t. -k1,1n -k2,2n -k3,3n -k4,4n | tail -1 | cut -f2-); exec /c/nvm4w/nodejs/node \"${plugin_dir}dist/index.js\"'"
+    "command": "bash \"${CLAUDE_CONFIG_DIR:-$HOME/.claude}/statusline-3lines.sh\""
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "printf '【post-compact reminder】\\n1) 不直接 commit 主线 — 所有改动开子分支 (feature/dev/jin.demo.<topic>)，merge 用 --no-ff\\n2) verification-before-completion — 真跑命令再宣告完成，evidence > claims\\n3) progress.md 是任务状态唯一真相源 — 不确定上下文时先 cat progress.md\\n4) 重输出派 subagent — 长日志/批量调研不要装进主会话\\n'"
+          }
+        ]
+      }
+    ]
   },
   "enabledPlugins": {
     "superpowers@claude-plugins-official": true,
-    "claude-hud@claude-hud": true,
-    "skill-creator@claude-plugins-official": true
+    "skill-creator@claude-plugins-official": true,
+    "andrej-karpathy-skills@karpathy-skills": true,
+    "frontend-design@claude-plugins-official": true,
+    "context7@claude-plugins-official": true,
+    "claude-md-management@claude-plugins-official": true,
+    "plugin-dev@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "claude-plugins-official": {
@@ -20,7 +59,16 @@
         "source": "github",
         "repo": "jarrodwatts/claude-hud"
       }
+    },
+    "karpathy-skills": {
+      "source": {
+        "source": "git",
+        "url": "https://github.com/multica-ai/andrej-karpathy-skills.git"
+      }
     }
   },
-  "autoUpdatesChannel": "latest"
+  "effortLevel": "high",
+  "autoUpdatesChannel": "latest",
+  "skipDangerousModePermissionPrompt": true,
+  "agentPushNotifEnabled": true
 }

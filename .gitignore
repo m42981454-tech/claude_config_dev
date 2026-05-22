@@ -35,3 +35,27 @@ Thumbs.db
 
 # secrets
 .env
+.credentials.json
+
+# session / runtime state
+.last-cleanup
+reset-date.conf
+session-env/
+sessions/
+tasks/
+plans/
+telemetry/
+ide/
+downloads/
+
+# plugin runtime / cache
+plugins/cache/
+plugins/data/
+plugins/marketplaces/
+plugins/plugin-catalog-cache.json
+
+# backup files
+*.bak
+
+# nested git repos (manage separately)
+agency-agents-reference/
