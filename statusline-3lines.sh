@@ -22,12 +22,13 @@ fi
 export CWD_LABEL
 CWD_LABEL="$(basename "$PWD")"
 export PYTHONIOENCODING=utf-8
+export PYTHONUTF8=1
 printf '%s' "$input" | /c/nvm4w/nodejs/node "${plugin_dir}dist/index.js" \
   | /c/Users/dev002/miniconda3/python -c '
 import sys, re, os
 from pathlib import Path
-sys.stdin.reconfigure(encoding="utf-8")
-sys.stdout.reconfigure(encoding="utf-8")
+sys.stdin.reconfigure(encoding="utf-8", newline="\n")
+sys.stdout.reconfigure(encoding="utf-8", newline="\n")
 
 ANSI_RE = re.compile(r"\x1b\[[0-9;]*m")
 MAGENTA = "\x1b[35m"
