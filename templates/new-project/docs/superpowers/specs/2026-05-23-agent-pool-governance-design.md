@@ -18,7 +18,7 @@
 - 旧版 agent frontmatter 使用了展示名形式，例如 `Security Engineer`，不利于稳定匹配；应改为 kebab-case `agent ID`。
 - `.enabled` 中曾存在不存在的 agent，loader 会报告 missing，形成启动噪音。
 - 全局默认 `model` 和 `effortLevel` 是更大的成本来源，已改为更保守默认值。
-- `SessionStart` hook、agent-loader 输出、statusline 脚本、插件启用情况都会影响体验或上下文噪音，后续需要单独治理。
+- `SessionStart` hook、agent-loader 输出和用户级 statusline 脚本已完成第一轮治理；插件 metadata 已转为本地状态，不再进入 Git 跟踪。
 - 所有三层 agents 暂未设置 `tools`、`maxTurns`、`effort` 边界，因此能力较宽，下一阶段应先做小范围试点。
 
 ## 优化方向总览
@@ -250,9 +250,10 @@ Report the copied files, removed template placeholders, and remaining TODOs.
 
 - 未给 agents 添加 `tools`、`maxTurns` 或 `effort` 边界。
 - 未瘦身长 agent prompt。
-- 未治理 `SessionStart` hook、statusline 脚本和插件启用策略。
+- 未完成完整 statusLine `light/hud` 模式切换。
+- 未完成插件启用策略分层；但插件 metadata 状态文件已改为本地忽略。
 
-结论：最初“稳妥瘦身方案”的项目内配置部分已经完成；共享池 metadata、全局默认 agents metadata 和 loader 的 project-local 优先处理也已完成。剩余项属于下一阶段的边界治理、prompt 瘦身和更深入的 hook/statusline 治理。
+结论：最初“稳妥瘦身方案”的项目内配置部分已经完成；共享池 metadata、全局默认 agents metadata、loader 的 project-local 优先处理、SessionStart 降噪、SessionEnd 本地学习和用户级 statusLine 结构优化也已完成。剩余项主要属于下一阶段的 agent 边界治理、prompt 瘦身、完整 statusLine 模式切换和插件启用策略整理。
 
 ## 当前阶段
 
@@ -267,12 +268,15 @@ Report the copied files, removed template placeholders, and remaining TODOs.
 - 新项目模板中已保留本设计履历。
 - 全局默认 agents 已完成 metadata 标准化，并已下沉 4 个开发项目默认角色到 new-project template。
 - loader 已支持 project-local-only agent 不产生共享池 missing 噪音。
+- SessionStart/SessionEnd 已完成第一轮降噪和本地学习记录接入。
+- 用户级 statusLine 已完成结构优化，但未同步到 new-project template。
+- plugin metadata 状态文件已改为本地忽略，不再作为治理提交的一部分。
 
 未完成：
 
 - 尚未给 agent 添加 `tools`、`maxTurns` 或 `effort` 边界。
 - 尚未把长 agent prompt 中的大段示例拆到 docs 中。
-- 尚未治理 `SessionStart` hook 输出和 statusline 脚本复杂度。
+- 尚未实现完整 statusLine `light/hud` 模式切换。
 - 尚未对插件启用策略做分层记录，避免无关插件增加上下文或工具噪音。
 
 ## 下一阶段建议

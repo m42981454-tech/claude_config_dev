@@ -2,8 +2,6 @@
 !settings.json
 !plugins/
 plugins/*
-!plugins/installed_plugins.json
-!plugins/known_marketplaces.json
 !plugins/claude-hud/
 plugins/claude-hud/*
 !plugins/claude-hud/config.json

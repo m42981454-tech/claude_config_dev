@@ -74,19 +74,26 @@ https://code.claude.com/docs/en/hooks
 
 ### 2. statusLine 轻量化
 
-保留 statusLine，但引入模式切换：
+原设计保留 statusLine，并计划引入模式切换：
 
 ```text
 CLAUDE_STATUSLINE_MODE=light
 CLAUDE_STATUSLINE_MODE=hud
 ```
 
-建议默认 `light`：
+目标默认 `light`：
 
 - 显示 cwd、branch、dirty counts、简短 token/usage 信息。
 - 不读 transcript 最近 300 行。
 - 不调用重型 HUD 插件链路。
 - 不调用多进程 node + python 管道。
+
+当前已完成的实际改动是用户级 HUD wrapper 结构优化，而不是完整 `light/hud` 模式切换：
+
+- 用户级入口脚本已改为 `scripts/statusline-lines.sh`。
+- Python 渲染逻辑已拆到 `scripts/statusline-render.py`，降低 shell 内嵌脚本维护成本。
+- Week reset 显示不再读取静态 `reset-date.conf`，而是根据 HUD 输出中的剩余时间动态计算。
+- new-project template 暂不内置 statusLine 脚本，避免把用户偏好的 UI 状态栏强加到每个项目。
 
 `hud` 模式保留现有信息密度，用于需要强状态可视化的项目。
 
@@ -137,7 +144,8 @@ Session memory updated: .claude/session-memory/latest.md
 | 文件 | 责任 |
 |---|---|
 | `scripts/agent-loader.sh` | 减少正常路径输出，只报告新增、缺失和异常 |
-| `scripts/statusline-light.sh` | 新增轻量 statusLine，可选替代现有 HUD wrapper |
+| `scripts/statusline-lines.sh` | 用户级 statusLine wrapper，保留当前三行 HUD 显示 |
+| `scripts/statusline-render.py` | 用户级 statusLine 渲染器，处理 HUD 输出、agent 活动和动态 Week reset |
 | `scripts/session-end-learn.sh` | SessionEnd 本地学习记录，不调用模型 |
 | `settings.json` | 用户级 hook/statusLine 配置 |
 | `templates/new-project/.claude/settings.json` | 新项目模板 hook 配置 |
@@ -268,7 +276,7 @@ Confirm session memory is not automatically injected into the next prompt.
 1. `latest.md` 是否要被 `SessionStart` 提示？
    - 建议：初期不提示，避免新噪音；只在用户手动查看。
 2. statusLine 是否马上替换？
-   - 建议：先做 agent-loader 和 SessionEnd，再做 statusLine，避免一次改动过多。
+   - 已决定：用户级 statusLine 只做结构优化并保留当前显示；new-project template 暂不同步 statusLine。
 
 ## 推荐结论
 
@@ -291,7 +299,9 @@ Confirm session memory is not automatically injected into the next prompt.
 
 当前暂缓：
 
-- Phase 3：statusLine 轻量模式尚未实施。现有 statusLine 脚本耦合 HUD、node、python 和 transcript 读取，建议单独提交，避免把 UI 状态栏改动混入 hook 降噪提交。
+- Phase 3：完整 `light/hud` 模式切换尚未实施。
+- 用户级 statusLine 已完成结构优化、脚本重命名和动态 Week reset；但仍保留 HUD、node、python 和 transcript 活动检测链路。
+- new-project template 暂不同步用户级 statusLine 脚本，保持模板对 UI 偏好的中立。
 
 已验证：
 
