@@ -53,7 +53,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "bash \"${CLAUDE_CONFIG_DIR:-$HOME/.claude}/statusline-3lines.sh\""
+    "command": "bash \"${CLAUDE_CONFIG_DIR:-$HOME/.claude}/scripts/statusline-3lines.sh\""
   },
   "enabledPlugins": {
     "superpowers@claude-plugins-official": true,
