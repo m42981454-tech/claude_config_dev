@@ -146,8 +146,58 @@ Report the copied files, removed template placeholders, and remaining TODOs.
 - 全局默认模型和 effort 已从高消耗默认值调整为更保守的默认值。
 - `<global-claude-config>/agents` 下的 8 个全局默认 agents 已完成 `name == filename stem` 标准化。
 - loader 已调整为 project-local agent 优先：项目本地同名文件存在时，不再因为共享池缺失而报告 missing。
-- new-project template 内置的 11 个 agents 已完成 `name == filename stem` 标准化。
-- new-project template 的 `.enabled.example` 和 `CLAUDE.md` 已同步为 kebab-case agent ID 说明。
+- new-project template 曾内置的 11 个 agents 已完成 `name == filename stem` 标准化。
+- new-project template 已进一步清理重复/近重复 agent：模板本地仅保留项目模板专属 agent，其余通过 `.enabled.example` 从 `<agent-dev-pool>` 按需启用。
+- new-project template 的 `.enabled.example` 和 `CLAUDE.md` 已同步为 kebab-case agent ID、推荐测试角色和按需加载说明。
+
+## new-project agent 补位评估
+
+本次重新对照了三层 agent 配置：
+
+- L2 全局默认 8 个：覆盖 PM、编排、后端、前端、代码审查、现实复核、最小变更和 Git 工作流。
+- L3 new-project 模板默认 1 个：只保留项目模板专属的 `project-management-jira-workflow-steward`。
+- L1.5 dev 专家池 44 个：作为按需启用来源，不应全量复制进项目模板。
+
+结论：模板内不应保留和 L1.5 dev 专家池重复/近重复的 agent 文件。为了避免默认上下文重新变重，本阶段把通用专家都放进 `.enabled.example` 推荐清单；项目确实需要时由 loader 从 `<agent-dev-pool>` 复制，只有项目专属或覆盖共享池行为的 agent 才放进 `.claude/agents/`。
+
+推荐按需启用角色：
+
+| Agent ID | 补位原因 | 是否默认内置 |
+|---|---|---|
+| `security-engineer` | 登录、权限、密钥、OWASP、合规和威胁建模是常见发布闸门 | 否，按风险启用 |
+| `api-tester` | API contract、endpoint 回归、服务间协议变更需要专门验证 | 否，按接口变更启用 |
+| `test-results-analyzer` | 测试报告、失败分布、flaky pattern 和质量趋势需要专门分析 | 否，按测试分析需要启用 |
+| `performance-benchmarker` | 延迟、吞吐、负载测试和性能瓶颈需要可复现基准 | 否，按性能风险启用 |
+| `accessibility-auditor` | UI、表单、键盘导航、ARIA 和 WCAG 需要专门验收 | 否，按 UI/无障碍要求启用 |
+| `devops-automator` | Docker、CI/CD、部署和监控属于常见交付链缺口 | 否，按交付链变更启用 |
+| `evidence-collector` | UI、浏览器、日志、截图和复现证据能补足人工验收证明 | 否，按验收需要启用 |
+| `codebase-onboarding-engineer` | 新项目或陌生仓库需要快速建立模块地图和风险地图 | 否，项目启动/接手时启用 |
+| `technical-writer` | release notes、runbook、ADR、交接文档在交付后期常被遗漏 | 否，文档密集阶段启用 |
+| `software-architect` | 跨系统设计和重大选型需要独立架构视角 | 否，重大设计时启用 |
+| `ai-engineer` | ML、AI 集成、模型部署和生产 AI 功能需要专门实现视角 | 否，按 AI 项目启用 |
+| `data-engineer` | ETL/ELT、dbt、lakehouse 和数据平台需要专门工程视角 | 否，按数据项目启用 |
+| `database-optimizer` | schema、索引、慢查询、迁移影响和数据库性能需要专门审查 | 否，按数据库风险启用 |
+| `incident-response-commander` | 生产事故、postmortem、on-call 和应急流程需要独立指挥视角 | 否，按生产事故启用 |
+| `sre-site-reliability-engineer` | SLO、error budget、observability 和 toil reduction 需要可靠性治理 | 否，按可靠性治理启用 |
+| `lsp-index-engineer` | LSP 编排、semantic indexing 和代码智能基础设施需要专门能力 | 否，按代码智能项目启用 |
+| `mcp-builder` | MCP server、tools、resources、prompts 和 agent capability 集成需要专门能力 | 否，按 MCP 项目启用 |
+
+测试类 agent 覆盖判断：
+
+| Agent ID | 覆盖范围 | 不适合替代 |
+|---|---|---|
+| `api-tester` | API contract、endpoint health、集成回归、API 性能与安全关注 | 浏览器验收、整体测试报告分析、无障碍审计 |
+| `test-results-analyzer` | 聚合测试结果、失败模式、flaky 分析、质量指标和改进建议 | 直接执行 API/E2E 测试 |
+| `performance-benchmarker` | 性能基准、延迟、吞吐、瓶颈证明和优化验证 | 功能正确性测试 |
+| `accessibility-auditor` | WCAG、键盘导航、屏幕阅读器、ARIA 和真实可访问性风险 | 视觉截图验收 |
+| `evidence-collector` | 浏览器证据、截图、日志、复现步骤和现实检查 | API contract 或性能基准 |
+
+本阶段已经把上述建议写入：
+
+- `templates/new-project/.claude/agents/.enabled.example`
+- `templates/new-project/CLAUDE.md`
+
+设计原则保持不变：模板内置角色要少而稳定，项目差异通过 `.enabled` 从 `<agent-dev-pool>` 复制；只有当某个角色是模板自身的专属约定，或需要覆盖共享池行为时，才放进 L3 项目本地 agent 目录。
 
 ## Claude Code 配置稳妥瘦身方案完成度
 
@@ -178,9 +228,10 @@ Report the copied files, removed template placeholders, and remaining TODOs.
 7. loader hygiene 初步处理：
    - project-local-only agent 已可通过本地同名文件避免 missing 噪音。
 8. new-project template 一致性：
-   - 模板内置 11 个 agents 已完成 `name == filename stem`。
-   - `.enabled.example` 已改为 kebab-case agent ID 示例。
-   - 模板 `CLAUDE.md` 中的 agent 表格、动态加载示例、派单示例已同步到新命名规则。
+   - 模板本地 agent 已从 11 个清理为 1 个项目专属 agent。
+   - 重复/近重复的通用专家已从模板本地 agent 目录移除，改由 `.enabled.example` 按需启用。
+   - `.enabled.example` 已改为 kebab-case agent ID 示例，并补充测试、性能、可访问性、证据采集等推荐角色。
+   - 模板 `CLAUDE.md` 中的 agent 表格、动态加载示例、派单示例和测试类 agent 覆盖判断已同步到新策略。
 
 已验证：
 
@@ -239,6 +290,45 @@ Report the copied files, removed template placeholders, and remaining TODOs.
 4. 确认没有丢失必要工具或明显降低输出质量后，再推广到共享池。
 
 不要一开始就全量添加 tool restrictions。构建、研究、实现、事故响应类 agent 往往需要比 review 类 agent 更宽的工具能力。
+
+## L2 基础 agent 二阶段瘦身设计
+
+本阶段重新评估了 `<global-claude-config>/agents` 下 8 个用户级默认 agent 与 `<agent-reference-root>/testing`、`<agent-dev-pool>` 的关系。
+
+关键结论：
+
+- `testing-api-tester` 没有进入 L2 基础 agent，并不是遗漏，而是因为它属于专项 API 验证能力。
+- L2 的 `backend-architect` 可以设计 API，`code-reviewer` 可以发现 breaking API contract，`reality-checker` 可以要求最终证据，但它们都不应该替代 `api-tester` 执行接口契约、端点健康、集成回归、性能和安全验证。
+- 同理，`accessibility-auditor`、`performance-benchmarker`、`evidence-collector`、`test-results-analyzer`、`security-engineer` 等都应作为按需启用的专项角色，而不是全部并入 L2 prompt。
+
+本阶段已经做的调整：
+
+1. `.enabled.example` 中把原先过强的来源措辞改为“推定来源 / 覆盖参考”，并说明这来自 reference 目录角色职责对照，不是 agent 文件中的显式血缘字段。
+2. 8 个 L2 用户级 agent 已新增轻量 `Boundary and Delegation` 段落：
+   - `project-manager-senior`：规划时识别 API、安全、性能、无障碍、DevOps、数据库等专项验收角色。
+   - `agents-orchestrator`：编排时将专项验证路由给对应 agent，而不是自己吞并能力。
+   - `backend-architect`：只负责后端设计，API 测试、DB 性能、安全对抗和部署流水线交给专项角色。
+   - `frontend-developer`：只做基础前端实现与基础 hygiene，浏览器证据、正式无障碍和深度性能验证交给专项角色。
+   - `code-reviewer`：把缺失的专项证据作为 review finding，不把代码审查伪装成完整验证。
+   - `reality-checker`：作为最终证据闸门，要求或复核专项 agent 的证据，缺失则判定 `NEEDS WORK`。
+   - `minimal-change-engineer`：发现跨域风险时记录 follow-up，不扩大当前最小修复范围。
+   - `git-workflow-master`：只管理 Git 边界，不用 Git 操作绕过质量闸门。
+
+推荐后续迁移方向：
+
+| 层级 | 建议保留/下沉 | 理由 |
+|---|---|---|
+| 用户级最小默认 | `minimal-change-engineer`、`git-workflow-master`、`code-reviewer` | 这三类在大多数会话中都有通用价值，且能约束改动、提交和审查质量 |
+| 用户级可选保留 | `project-manager-senior` | 如果日常经常从需求拆解开始，可以保留；否则可下沉到项目模板 |
+| 项目模板默认候选 | `agents-orchestrator`、`backend-architect`、`frontend-developer`、`reality-checker` | 更像开发项目默认工作流角色，不一定适合所有 Claude Code 会话 |
+| 项目按需启用 | `api-tester`、`security-engineer`、`evidence-collector`、`performance-benchmarker`、`accessibility-auditor` 等 | 专项能力强，但默认加载会增加上下文和工具面 |
+
+迁移原则：
+
+- 不要一次性移动或删除用户级 8 个 agent。
+- 先观察边界补强后的实际使用效果。
+- 如果默认上下文仍然过重，再把“项目模板默认候选”复制到 `<new-project-template>/.claude/agents/`，并从用户级目录移除。
+- 用户级只保留最通用、跨项目、跨任务都成立的角色。
 
 ## Claude Code 额度耗尽时的离线手顺
 

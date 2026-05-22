@@ -62,7 +62,7 @@ PROGRESS 维护规约见 [`.claude/rules/progress-conventions.md`](./.claude/rul
 L1   <agent-reference-root>/              188 个   完整 catalog（备查，不加载）
 L1.5 <agent-dev-pool>/                    44 个    dev 专家池（项目按需选用）
 L2   <global-claude-config>/agents/       8 个     全局 baseline（任何项目都加载）
-L3   <project>/.claude/agents/            按项目    L1.5 选取 + 项目自定义
+L3   <project>/.claude/agents/            按项目    项目专属 agent + 本地覆盖
 ```
 
 ### L2 全局基础工具箱（任何项目都加载，从用户级 `<global-claude-config>/agents`）
@@ -78,21 +78,47 @@ L3   <project>/.claude/agents/            按项目    L1.5 选取 + 项目自�
 | **minimal-change-engineer** | haiku | bug fix / 小修小补 |
 | **git-workflow-master** | haiku | git 操作 / 分支策略 |
 
-### L3 项目专项（本项目模板默认 11 个，从 `.claude/agents/` 加载）
+### L3 项目专项（本项目模板默认 1 个，从 `.claude/agents/` 加载）
 
 | Agent ID | Model | 触发场景 |
 |---|---|---|
-| **engineering-ai-engineer** | sonnet | ML 模型 / AI 集成 / 数据 pipeline |
-| **engineering-database-optimizer** | sonnet | DB schema / 索引 / migration 影响 |
-| **engineering-data-engineer** | sonnet | ETL/ELT / Spark / dbt / 数据基础设施 |
-| **engineering-incident-response-commander** | sonnet | 生产事故 / postmortem / on-call |
-| **engineering-sre** | sonnet | SLO / 监控 / chaos engineering |
-| **lsp-index-engineer** | sonnet | LSP 编排 / semantic indexing |
 | **project-management-jira-workflow-steward** | opus | Jira-linked git workflow |
-| **specialized-mcp-builder** | sonnet | Model Context Protocol server 开发 |
-| **testing-accessibility-auditor** | sonnet | WCAG 审计 / 屏幕阅读器 |
-| **testing-performance-benchmarker** | sonnet | 性能测量 / 优化 |
-| **testing-test-results-analyzer** | sonnet | 测试结果分析 / 质量指标 |
+
+模板目录不再内置可从 `<agent-dev-pool>` 取得的重复 agent。通用专家通过 `.enabled` 按需复制，项目确实需要覆盖共享池行为时，才在 `.claude/agents/` 放同名本地版本。
+
+### 推荐补位角色（从 L1.5 池按需启用）
+
+L2 全局角色覆盖 PM、编排、后端、前端、代码审查、现实复核、最小变更和 Git。其他专家从 L1.5 dev 池按需启用，不默认全量加载，避免把上下文和工具面重新撑大。
+
+| Agent ID | 建议启用时机 |
+|---|---|
+| **security-engineer** | 有登录、权限、密钥、支付、用户数据、网络边界或合规风险时 |
+| **api-tester** | 有 API contract、外部集成、endpoint 回归或服务间协议变更时 |
+| **test-results-analyzer** | 需要分析测试报告、失败分布、flaky pattern 或质量趋势时 |
+| **performance-benchmarker** | 需要负载测试、延迟/吞吐基准、瓶颈定位或性能验收时 |
+| **accessibility-auditor** | 有 UI、表单、键盘导航、ARIA 或 WCAG 验收要求时 |
+| **devops-automator** | 有 Docker、CI/CD、部署、监控、环境变量或基础设施变更时 |
+| **evidence-collector** | 需要浏览器证据、截图、日志、可复现步骤或 UI 验收证明时 |
+| **codebase-onboarding-engineer** | 新项目初始化、接手陌生仓库、模块边界不清或需要风险地图时 |
+| **technical-writer** | 文档密集 sprint、release notes、runbook、ADR 或面向团队交接时 |
+| **software-architect** | 跨系统设计、边界重划、长期架构决策或重大技术选型时 |
+| **ai-engineer** | 有 ML、AI 集成、模型部署或生产 AI 功能时 |
+| **data-engineer** | 有 ETL/ELT、dbt、lakehouse、数据平台或数据质量链路时 |
+| **database-optimizer** | 有 schema、索引、慢查询、迁移影响或数据库性能风险时 |
+| **incident-response-commander** | 有生产事故、postmortem、on-call 或应急流程建设时 |
+| **sre-site-reliability-engineer** | 有 SLO、error budget、observability、toil reduction 或可靠性治理时 |
+| **lsp-index-engineer** | 有 LSP 编排、semantic indexing 或代码智能基础设施时 |
+| **mcp-builder** | 有 MCP server、tools、resources、prompts 或 agent capability 集成时 |
+
+### 现有测试类 agent 覆盖判断
+
+| Agent ID | 覆盖范围 | 不适合替代 |
+|---|---|---|
+| **api-tester** | API contract、endpoint health、集成回归、API 性能与安全关注 | 不替代浏览器验收、整体测试报告分析或无障碍审计 |
+| **test-results-analyzer** | 聚合测试结果、失败模式、flaky 分析、质量指标和改进建议 | 不直接执行 API/E2E 测试 |
+| **performance-benchmarker** | 性能基准、延迟、吞吐、瓶颈证明和优化验证 | 不替代功能正确性测试 |
+| **accessibility-auditor** | WCAG、键盘导航、屏幕阅读器、ARIA 和真实可访问性风险 | 不替代视觉截图验收 |
+| **evidence-collector** | 浏览器证据、截图、日志、复现步骤和现实检查 | 不替代专门的 API contract 或性能基准 |
 
 ### 动态加载 — `.enabled` 清单（从 L1.5 池追加）
 
@@ -110,6 +136,9 @@ L3   <project>/.claude/agents/            按项目    L1.5 选取 + 项目自�
 # 本项目需要的额外 agent
 security-engineer
 api-tester
+test-results-analyzer
+performance-benchmarker
+accessibility-auditor
 evidence-collector
 devops-automator
 ```
