@@ -19,7 +19,7 @@ fi
 
 # Pool must exist
 if [ ! -d "$POOL" ]; then
-    echo '{"systemMessage":"[!] agent pool not found: ~/.claude/agency-agents-dev/"}'
+    echo '{"systemMessage":"⚠️ agent pool not found: ~/.claude/agency-agents-dev/"}'
     exit 0
 fi
 
@@ -63,7 +63,7 @@ done < "$ENABLED_FILE"
 # Build report
 MSG=""
 if [ $LOADED -gt 0 ]; then
-    MSG="[Loader] Agent loader: +$LOADED new"
+    MSG="🤖 Agent loader: +$LOADED new"
 fi
 if [ $SKIPPED -gt 0 ]; then
     [ -n "$MSG" ] && MSG="$MSG, "
@@ -71,7 +71,7 @@ if [ $SKIPPED -gt 0 ]; then
 fi
 if [ $MISSING -gt 0 ]; then
     [ -n "$MSG" ] && MSG="$MSG, "
-    MSG="${MSG}[!] $MISSING missing in pool:$MISSING_NAMES"
+    MSG="${MSG}⚠️ $MISSING missing in pool:$MISSING_NAMES"
 fi
 
 if [ -n "$MSG" ]; then

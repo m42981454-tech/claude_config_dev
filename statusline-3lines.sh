@@ -39,11 +39,11 @@ if git -C "$PWD" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
     if [ -n "$_upstream" ]; then
         _ahead=$(git -C "$PWD" rev-list "${_upstream}..HEAD" --count 2>/dev/null || echo 0)
         _behind=$(git -C "$PWD" rev-list "HEAD..${_upstream}" --count 2>/dev/null || echo 0)
-        [ "$_ahead"  -gt 0 ] && GIT_INFO="${GIT_INFO} +${_ahead}ahead"
-        [ "$_behind" -gt 0 ] && GIT_INFO="${GIT_INFO} -${_behind}behind"
+        [ "$_ahead"  -gt 0 ] && GIT_INFO="${GIT_INFO} ✚${_ahead}"
+        [ "$_behind" -gt 0 ] && GIT_INFO="${GIT_INFO} ↓${_behind}"
     else
         _local=$(git -C "$PWD" rev-list HEAD --count 2>/dev/null || echo 0)
-        GIT_INFO="${GIT_INFO} local +${_local}"
+        GIT_INFO="${GIT_INFO} local ✚${_local}"
     fi
 
     # total commits on branch + last commit info
@@ -177,8 +177,8 @@ def colorize_git(s):
     s = re.sub(r"(\+\d+)",  YELLOW + r"\1" + RESET, s)
     s = re.sub(r"(~\d+)",   RED    + r"\1" + RESET, s)
     s = re.sub(r"(\?\d+)",  GREY   + r"\1" + RESET, s)
-    s = re.sub(r"(\+\d+ahead)",  GREEN + r"\1" + RESET, s)
-    s = re.sub(r"(-\d+behind)",  RED   + r"\1" + RESET, s)
+    s = re.sub(r"(✚\d+)",  GREEN  + r"\1" + RESET, s)
+    s = re.sub(r"(↓\d+)",   RED    + r"\1" + RESET, s)
     s = re.sub(r"\blocal\b", YELLOW + "local" + RESET, s)
     s = re.sub(r"(\([^)]+\))", DIM + r"\1" + RESET, s)
     s = re.sub(r"(\"[^\"]+" + "…" + r"?\")", DIM + r"\1" + RESET, s)
@@ -192,22 +192,13 @@ cwd_label = os.environ.get("CWD_LABEL", "")
 if cwd_label:
     identity.append(f"{BOLD}{CYAN}{cwd_label}{RESET}")
 
-def replace_emoji(s):
-    """Replace claude-hud emoji markers with ASCII for terminal compatibility"""
-    return (s.replace("◐", "o")
-             .replace("✓", "v")
-             .replace("▸", ">")
-             .replace("…", "..."))
-
 for raw_line in sys.stdin.read().splitlines():
     plain = strip_ansi(raw_line).lstrip()
     if not plain:
         continue
-    starts_activity = plain[:1] in ("◐", "✓", "▸")  # markers from claude-hud
+    starts_activity = plain[:1] in ("◐", "✓", "▸")  # ◐ ✓ ▸
     if starts_activity:
         state = "activity"
-        # Replace emoji for display while keeping ANSI codes
-        raw_line = replace_emoji(raw_line)
         if MAGENTA in raw_line:
             agents.append(raw_line)
             last_bucket = "agents"
@@ -215,14 +206,14 @@ for raw_line in sys.stdin.read().splitlines():
             tools_todos.append(raw_line)
             last_bucket = "tools_todos"
     elif state == "identity":
-        identity.append(replace_emoji(raw_line))
+        identity.append(raw_line)
     else:
         if last_bucket == "agents" and agents:
-            agents[-1] += " " + replace_emoji(raw_line.strip())
+            agents[-1] += " " + raw_line.strip()
         elif tools_todos:
-            tools_todos[-1] += " " + replace_emoji(raw_line.strip())
+            tools_todos[-1] += " " + raw_line.strip()
         else:
-            identity.append(replace_emoji(raw_line))
+            identity.append(raw_line)
 
 reset_conf = Path.home() / ".claude" / "reset-date.conf"
 reset_date = reset_conf.read_text().strip() if reset_conf.exists() else ""
@@ -230,9 +221,7 @@ reset_date = reset_conf.read_text().strip() if reset_conf.exists() else ""
 tok_lines, usage_lines, identity_main = [], [], []
 for item in identity:
     plain_item = strip_ansi(item)
-    if "tok:" in plain_item or "⏱" in plain_item or "T:" in plain_item:
-        # Replace stopwatch emoji with ASCII T: for display
-        item = item.replace("⏱️", "T:").replace("⏱", "T:")
+    if "tok:" in plain_item or "⏱" in plain_item:
         tok_lines.append(item)
     elif "用量" in plain_item or "本周" in plain_item or "█" in plain_item or "░" in plain_item:
         usage_item = item.replace("用量", "Sess").replace("本周", "Week")
@@ -245,7 +234,7 @@ if reset_date and usage_lines:
     for item in usage_lines:
         plain_item = strip_ansi(item)
         if "Week" in plain_item:
-            item = item.rstrip() + " ->" + reset_date
+            item = item.rstrip() + " →" + reset_date
         new_usage.append(item)
     usage_lines = new_usage
 
@@ -270,7 +259,7 @@ active_name, active_elapsed = read_active_agent_from_transcript()
 if active_name:
     bg = agent_bg_color(active_name)
     elapsed_str = f" [{active_elapsed}s]" if active_elapsed > 0 else ""
-    agent_block = f"{bg}{FG_WHITE}{BOLD}  >>> AGENT: {active_name}{elapsed_str} <<<  {RESET}"
+    agent_block = f"{bg}{FG_WHITE}{BOLD}  ⚡ AGENT: {active_name}{elapsed_str} ⚡  {RESET}"
     line3_parts.append(agent_block)
 
 # Existing claude-hud-derived activity (tools_todos / agents bucket)
