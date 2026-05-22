@@ -271,13 +271,9 @@ if active_name:
     agent_block = f"{bg}{FG_WHITE}{BOLD}  ⚡ AGENT: {active_name}{elapsed_str} ⚡  {RESET}"
     line3_parts.append(agent_block)
 
-# Existing claude-hud-derived activity (tools_todos / agents bucket)
+# Tools/todos activity from claude-hud（不再显示 claude-hud agents bucket
+# 历史已完成 agent，避免与 transcript-based 当前活跃块冗余）
 line3_parts.extend(tools_todos)
-if agents:
-    agent_text = SEP.join(agents)
-    bg = agent_bg_color(strip_ansi(agent_text))
-    agent_label = bg + FG_WHITE + BOLD + " AGENT " + RESET
-    line3_parts.append(agent_label + " " + agent_text)
 
 if line3_parts: out.append(SEP.join(line3_parts))
 sys.stdout.write("\n".join(out) + "\n")
