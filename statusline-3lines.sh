@@ -75,8 +75,34 @@ GREEN  = "\x1b[32m"
 RED    = "\x1b[31m"
 YELLOW = "\x1b[33m"
 GREY   = "\x1b[90m"
-BG_MAGENTA = "\x1b[45m"
 FG_WHITE   = "\x1b[97m"
+
+AGENT_BG = {
+    "cyan":   "\x1b[46m",
+    "blue":   "\x1b[44m",
+    "purple": "\x1b[45m",
+    "orange": "\x1b[43m",
+    "slate":  "\x1b[100m",
+    "red":    "\x1b[41m",
+    "green":  "\x1b[42m",
+}
+AGENT_KEYWORDS = {
+    "orchestrator":   "cyan",
+    "backend":        "blue",
+    "code reviewer":  "purple",
+    "frontend":       "cyan",
+    "git workflow":   "orange",
+    "minimal":        "slate",
+    "project manager":"blue",
+    "reality":        "red",
+}
+
+def agent_bg_color(text):
+    t = text.lower()
+    for kw, color in AGENT_KEYWORDS.items():
+        if kw in t:
+            return AGENT_BG.get(color, "\x1b[45m")
+    return "\x1b[45m"
 
 def strip_ansi(s):
     return ANSI_RE.sub("", s)
@@ -162,8 +188,10 @@ if line2_parts: out.append(SEP.join(line2_parts))
 
 line3_parts = tools_todos[:]
 if agents:
-    agent_label = BG_MAGENTA + FG_WHITE + BOLD + " AGENT " + RESET
-    line3_parts.append(agent_label + " " + SEP.join(agents))
+    agent_text = SEP.join(agents)
+    bg = agent_bg_color(strip_ansi(agent_text))
+    agent_label = bg + FG_WHITE + BOLD + " AGENT " + RESET
+    line3_parts.append(agent_label + " " + agent_text)
 if line3_parts: out.append(SEP.join(line3_parts))
 sys.stdout.write("\n".join(out) + "\n")
 '
