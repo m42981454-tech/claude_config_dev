@@ -146,6 +146,8 @@ Report the copied files, removed template placeholders, and remaining TODOs.
 - 全局默认模型和 effort 已从高消耗默认值调整为更保守的默认值。
 - `<global-claude-config>/agents` 下的 8 个全局默认 agents 已完成 `name == filename stem` 标准化。
 - loader 已调整为 project-local agent 优先：项目本地同名文件存在时，不再因为共享池缺失而报告 missing。
+- new-project template 内置的 11 个 agents 已完成 `name == filename stem` 标准化。
+- new-project template 的 `.enabled.example` 和 `CLAUDE.md` 已同步为 kebab-case agent ID 说明。
 
 ## Claude Code 配置稳妥瘦身方案完成度
 
@@ -175,6 +177,10 @@ Report the copied files, removed template placeholders, and remaining TODOs.
    - `<global-claude-config>/agents` 中 8 个默认 agents 已完成 `name == filename stem`。
 7. loader hygiene 初步处理：
    - project-local-only agent 已可通过本地同名文件避免 missing 噪音。
+8. new-project template 一致性：
+   - 模板内置 11 个 agents 已完成 `name == filename stem`。
+   - `.enabled.example` 已改为 kebab-case agent ID 示例。
+   - 模板 `CLAUDE.md` 中的 agent 表格、动态加载示例、派单示例已同步到新命名规则。
 
 已验证：
 
@@ -183,6 +189,7 @@ Report the copied files, removed template placeholders, and remaining TODOs.
 - 项目本地 settings 文件未再被 git tracking。
 - `<agent-dev-pool>` 中 agent `name` 不合规项为 0。
 - `<global-claude-config>/agents` 中 agent `name` 不合规项为 0。
+- new-project template 内置 agents 的 `name` 不合规项为 0。
 - 相关文档不包含固定本机路径。
 
 尚未纳入本阶段：

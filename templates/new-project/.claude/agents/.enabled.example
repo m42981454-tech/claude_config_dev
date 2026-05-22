@@ -1,31 +1,34 @@
-# Project Agent Loadout — 一行一个 agent 名，# 注释
+# Project Agent Loadout — one kebab-case agent ID per line, # for comments
 #
 # 用法:
 #   1. 把本文件重命名为 .enabled
-#   2. 添加本项目需要的 agent 名（必须匹配 ~/.claude/agency-agents-dev/ 中 frontmatter `name:`）
-#   3. 下次 Claude Code 启动时，SessionStart hook 自动从 L1.5 池复制到本目录
+#   2. 添加本项目需要的 agent ID（必须匹配 <agent-dev-pool>/<agent-id>.md 和 frontmatter `name:`）
+#   3. 下次 Claude Code 启动时，SessionStart hook 自动从共享池复制缺失 agent 到本目录
+#   4. 如果本目录已经有同名 agent 文件，项目本地版本优先，不会被共享池覆盖
 #
 # 可用 agent 清单（44 个）查询:
-#   ls ~/.claude/agency-agents-dev/
+#   ls <agent-dev-pool>/
 #
 # 已经在 L2 全局加载的（无需在此添加）:
-#   Senior Project Manager, Agents Orchestrator, Backend Architect, Frontend Developer,
-#   Code Reviewer, Reality Checker, Minimal Change Engineer, Git Workflow Master
+#   project-manager-senior, agents-orchestrator, backend-architect, frontend-developer,
+#   code-reviewer, reality-checker, minimal-change-engineer, git-workflow-master
 #
 # L3 模板默认 11 个（已在本目录文件存在，无需在此添加）:
-#   AI Engineer, Database Optimizer, Data Engineer, Incident Response Commander, SRE,
-#   LSP/Index Engineer, Jira Workflow Steward, MCP Builder, Accessibility Auditor,
-#   Performance Benchmarker, Test Results Analyzer
+#   engineering-ai-engineer, engineering-database-optimizer, engineering-data-engineer,
+#   engineering-incident-response-commander, engineering-sre, lsp-index-engineer,
+#   project-management-jira-workflow-steward, specialized-mcp-builder,
+#   testing-accessibility-auditor, testing-performance-benchmarker,
+#   testing-test-results-analyzer
 
 # === 示例: 取消注释你需要的 ===
 
-# Security Engineer            # auth / token / secrets / OWASP
-# API Tester                   # API 健康检查 / contract
-# Evidence Collector           # UI / 浏览器证据
-# DevOps Automator             # docker / CI/CD / monitoring
-# Technical Writer             # 文档密集 sprint
-# Codebase Onboarding Engineer # 进陌生 codebase 区
-# Mobile App Builder           # iOS / Android / cross-platform
-# Software Architect           # 系统级架构设计
-# Rapid Prototyper             # 快速 PoC / MVP
-# Senior Developer             # premium 全栈实装
+# security-engineer            # auth / token / secrets / OWASP
+# api-tester                   # API 健康检查 / contract
+# evidence-collector           # UI / 浏览器证据
+# devops-automator             # docker / CI/CD / monitoring
+# technical-writer             # 文档密集 sprint
+# codebase-onboarding-engineer # 进陌生 codebase 区
+# mobile-app-builder           # iOS / Android / cross-platform
+# software-architect           # 系统级架构设计
+# rapid-prototyper             # 快速 PoC / MVP
+# senior-developer             # premium 全栈实装

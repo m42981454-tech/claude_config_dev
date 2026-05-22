@@ -59,70 +59,70 @@ PROGRESS 维护规约见 [`.claude/rules/progress-conventions.md`](./.claude/rul
 ### 三层 Agent 架构
 
 ```
-L1   ~/.claude/agency-agents-reference/   188 个   完整 catalog（备查，不加载）
-L1.5 ~/.claude/agency-agents-dev/         44 个    dev 专家池（项目按需选用）
-L2   ~/.claude/agents/                    8 个     全局 baseline（任何项目都加载）
+L1   <agent-reference-root>/              188 个   完整 catalog（备查，不加载）
+L1.5 <agent-dev-pool>/                    44 个    dev 专家池（项目按需选用）
+L2   <global-claude-config>/agents/       8 个     全局 baseline（任何项目都加载）
 L3   <project>/.claude/agents/            按项目    L1.5 选取 + 项目自定义
 ```
 
-### L2 全局基础工具箱（任何项目都加载，从用户级 `~/.claude/agents/`）
+### L2 全局基础工具箱（任何项目都加载，从用户级 `<global-claude-config>/agents`）
 
-| Title Case Name | Model | 触发场景 |
+| Agent ID | Model | 触发场景 |
 |---|---|---|
-| **Senior Project Manager** | opus | 需求拆解、任务规划 |
-| **Agents Orchestrator** | sonnet | 多 agent 流水线协调 |
-| **Backend Architect** | sonnet | 后端 API / 服务架构 / 数据库 |
-| **Frontend Developer** | sonnet | React / Vue / CSS / 组件 |
-| **Code Reviewer** | sonnet | 每 sprint 必经审查 |
-| **Reality Checker** | sonnet | release readiness / GA 前复核 |
-| **Minimal Change Engineer** | haiku | bug fix / 小修小补 |
-| **Git Workflow Master** | haiku | git 操作 / 分支策略 |
+| **project-manager-senior** | opus | 需求拆解、任务规划 |
+| **agents-orchestrator** | sonnet | 多 agent 流水线协调 |
+| **backend-architect** | sonnet | 后端 API / 服务架构 / 数据库 |
+| **frontend-developer** | sonnet | React / Vue / CSS / 组件 |
+| **code-reviewer** | sonnet | 每 sprint 必经审查 |
+| **reality-checker** | sonnet | release readiness / GA 前复核 |
+| **minimal-change-engineer** | haiku | bug fix / 小修小补 |
+| **git-workflow-master** | haiku | git 操作 / 分支策略 |
 
 ### L3 项目专项（本项目模板默认 11 个，从 `.claude/agents/` 加载）
 
-| Title Case Name | Model | 触发场景 |
+| Agent ID | Model | 触发场景 |
 |---|---|---|
-| **AI Engineer** | sonnet | ML 模型 / AI 集成 / 数据 pipeline |
-| **Database Optimizer** | sonnet | DB schema / 索引 / migration 影响 |
-| **Data Engineer** | sonnet | ETL/ELT / Spark / dbt / 数据基础设施 |
-| **Incident Response Commander** | sonnet | 生产事故 / postmortem / on-call |
-| **SRE** | sonnet | SLO / 监控 / chaos engineering |
-| **LSP/Index Engineer** | sonnet | LSP 编排 / semantic indexing |
-| **Jira Workflow Steward** | opus | Jira-linked git workflow |
-| **MCP Builder** | sonnet | Model Context Protocol server 开发 |
-| **Accessibility Auditor** | sonnet | WCAG 审计 / 屏幕阅读器 |
-| **Performance Benchmarker** | sonnet | 性能测量 / 优化 |
-| **Test Results Analyzer** | sonnet | 测试结果分析 / 质量指标 |
+| **engineering-ai-engineer** | sonnet | ML 模型 / AI 集成 / 数据 pipeline |
+| **engineering-database-optimizer** | sonnet | DB schema / 索引 / migration 影响 |
+| **engineering-data-engineer** | sonnet | ETL/ELT / Spark / dbt / 数据基础设施 |
+| **engineering-incident-response-commander** | sonnet | 生产事故 / postmortem / on-call |
+| **engineering-sre** | sonnet | SLO / 监控 / chaos engineering |
+| **lsp-index-engineer** | sonnet | LSP 编排 / semantic indexing |
+| **project-management-jira-workflow-steward** | opus | Jira-linked git workflow |
+| **specialized-mcp-builder** | sonnet | Model Context Protocol server 开发 |
+| **testing-accessibility-auditor** | sonnet | WCAG 审计 / 屏幕阅读器 |
+| **testing-performance-benchmarker** | sonnet | 性能测量 / 优化 |
+| **testing-test-results-analyzer** | sonnet | 测试结果分析 / 质量指标 |
 
 ### 动态加载 — `.enabled` 清单（从 L1.5 池追加）
 
-需要其他 dev 专家时（如 Security Engineer / API Tester / DevOps Automator 等），编辑：
+需要其他 dev 专家时（如 `security-engineer` / `api-tester` / `devops-automator` 等），编辑：
 
 ```
 .claude/agents/.enabled
 ```
 
-一行一个 agent 名（名称必须匹配 L1.5 池中 frontmatter `name:`），# 开头是注释。SessionStart hook 会自动从 `~/.claude/agency-agents-dev/` 复制到项目 `.claude/agents/`。
+一行一个 kebab-case agent ID（必须匹配 L1.5 池中 frontmatter `name:`），# 开头是注释。SessionStart hook 会自动从 `<agent-dev-pool>` 复制缺失 agent 到项目 `.claude/agents/`。如果项目本地已经存在同名 agent 文件，项目版本优先，不会被共享池覆盖。
 
 `.enabled` 示例:
 
 ```
 # 本项目需要的额外 agent
-Security Engineer
-API Tester
-Evidence Collector
-DevOps Automator
+security-engineer
+api-tester
+evidence-collector
+devops-automator
 ```
 
-可用清单（44 个）：`ls ~/.claude/agency-agents-dev/`
+可用清单（44 个）：`ls <agent-dev-pool>/`
 
 **加载优先级**: L3 项目级 > L2 用户级（同名时项目级覆盖，仅对该项目生效）。
 
 ### 派单关键约定
 
-- subagent_type 用 **Title Case friendly name**（如 `"Backend Architect"`），**不是** kebab-case file name
+- subagent_type / agent ID 使用当前 agent frontmatter 的 kebab-case `name`（如 `backend-architect`）
 - 派单时 4 channel 强制：description（ch1）+ commit subject（ch2）+ PROGRESS 表（ch3）+ agent 返回 header（ch4）
-- 必经双签：Code Reviewer + Tester（API Tester / Evidence Collector）
+- 必经双签：`code-reviewer` + tester（如 `api-tester` / `evidence-collector`）
 - 按需追加签字 ❌ → 阻断 merge
 
 ### 派单模板
@@ -130,7 +130,7 @@ DevOps Automator
 ```
 Agent({
   description: "[T#·Role·Sprint·Phase] <动词 + 短描述>",
-  subagent_type: "Backend Architect",   // Title Case friendly name
+  subagent_type: "backend-architect",
   prompt: "上下文：...（文件路径 + 行号 + 相关规范）。
            任务：...（明确动作，最小变更范围）。
            验收：...（测试命令 / 期望测试通过）。
