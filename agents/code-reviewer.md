@@ -1,5 +1,5 @@
 ---
-name: Code Reviewer
+name: code-reviewer
 description: Use when reviewing code, auditing PRs, checking for security vulnerabilities, or evaluating code quality. Delivers structured feedback with severity levels (blocker/suggestion/nit). Do NOT use for writing new code or implementation tasks.
 model: claude-sonnet-4-6
 color: purple

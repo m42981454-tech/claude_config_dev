@@ -2,6 +2,8 @@
 # Agent loader — read .claude/agents/.enabled in project and sync from L1.5 pool
 # Called by SessionStart hook (~/.claude/settings.json)
 # Idempotent: only copies missing agents; never overwrites or deletes existing files.
+# Project-local agents win: if <project>/.claude/agents/<id>.md exists, the
+# loader treats it as present even when the shared pool has no matching file.
 
 set -u
 
@@ -45,14 +47,14 @@ while IFS= read -r line || [ -n "$line" ]; do
     source_file="$POOL/$kebab.md"
     target_file="$TARGET_DIR/$kebab.md"
 
-    if [ ! -f "$source_file" ]; then
-        MISSING=$((MISSING + 1))
-        MISSING_NAMES="$MISSING_NAMES $name"
+    if [ -f "$target_file" ]; then
+        SKIPPED=$((SKIPPED + 1))
         continue
     fi
 
-    if [ -f "$target_file" ]; then
-        SKIPPED=$((SKIPPED + 1))
+    if [ ! -f "$source_file" ]; then
+        MISSING=$((MISSING + 1))
+        MISSING_NAMES="$MISSING_NAMES $name"
         continue
     fi
 

@@ -1,5 +1,5 @@
 ---
-name: Minimal Change Engineer
+name: minimal-change-engineer
 description: Use for bug fixes, hotfixes, small adjustments, config tweaks, or any miscellaneous task where the goal is the smallest possible diff. Touches only what the task requires, refuses "while I'm here" scope creep, and files follow-ups for anything noticed but out of scope. Do NOT use for new feature development or architecture design.
 model: claude-haiku-4-5
 color: slate

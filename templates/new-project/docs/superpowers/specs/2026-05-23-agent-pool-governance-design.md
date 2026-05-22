@@ -144,6 +144,8 @@ Report the copied files, removed template placeholders, and remaining TODOs.
 - `<agent-dev-pool>` 下新增了 `AGENT_RULES.md` 维护规则。
 - `<agent-dev-pool>` 里的 44 个 agent 已完成 `name == filename stem` 标准化。
 - 全局默认模型和 effort 已从高消耗默认值调整为更保守的默认值。
+- `<global-claude-config>/agents` 下的 8 个全局默认 agents 已完成 `name == filename stem` 标准化。
+- loader 已调整为 project-local agent 优先：项目本地同名文件存在时，不再因为共享池缺失而报告 missing。
 
 ## Claude Code 配置稳妥瘦身方案完成度
 
@@ -169,6 +171,10 @@ Report the copied files, removed template placeholders, and remaining TODOs.
 5. 共享池 metadata 标准化：
    - `<agent-dev-pool>` 中 44 个 agents 已完成 `name == filename stem`。
    - 已新增 `<agent-dev-pool>/AGENT_RULES.md` 作为后续新增 agent 的维护规则。
+6. 全局默认 agents metadata 标准化：
+   - `<global-claude-config>/agents` 中 8 个默认 agents 已完成 `name == filename stem`。
+7. loader hygiene 初步处理：
+   - project-local-only agent 已可通过本地同名文件避免 missing 噪音。
 
 已验证：
 
@@ -176,6 +182,7 @@ Report the copied files, removed template placeholders, and remaining TODOs.
 - 示例项目 `.enabled` 中每个 ID 都能映射到项目本地 agent 文件。
 - 项目本地 settings 文件未再被 git tracking。
 - `<agent-dev-pool>` 中 agent `name` 不合规项为 0。
+- `<global-claude-config>/agents` 中 agent `name` 不合规项为 0。
 - 相关文档不包含固定本机路径。
 
 尚未纳入本阶段：
@@ -183,9 +190,8 @@ Report the copied files, removed template placeholders, and remaining TODOs.
 - 未给 agents 添加 `tools`、`maxTurns` 或 `effort` 边界。
 - 未瘦身长 agent prompt。
 - 未治理 `SessionStart` hook、statusline 脚本和插件启用策略。
-- 未标准化 `<global-claude-config>/agents` 下的全局默认 agents。
 
-结论：最初“稳妥瘦身方案”的项目内配置部分已经完成；共享池 metadata 也已完成。剩余项属于下一阶段的边界治理、prompt 瘦身和 loader/hook 治理。
+结论：最初“稳妥瘦身方案”的项目内配置部分已经完成；共享池 metadata、全局默认 agents metadata 和 loader 的 project-local 优先处理也已完成。剩余项属于下一阶段的边界治理、prompt 瘦身和更深入的 hook/statusline 治理。
 
 ## 当前阶段
 
@@ -198,13 +204,13 @@ Report the copied files, removed template placeholders, and remaining TODOs.
 - 项目 `.enabled` 行为已记录。
 - 项目本地覆盖行为已记录。
 - 新项目模板中已保留本设计履历。
+- 全局默认 agents 已完成 metadata 标准化。
+- loader 已支持 project-local-only agent 不产生共享池 missing 噪音。
 
 未完成：
 
 - 尚未给 agent 添加 `tools`、`maxTurns` 或 `effort` 边界。
 - 尚未把长 agent prompt 中的大段示例拆到 docs 中。
-- 尚未标准化 `<global-claude-config>/agents` 下的全局默认 agents。
-- 尚未优化 loader 对 project-only agent 的 missing 报告。
 - 尚未治理 `SessionStart` hook 输出和 statusline 脚本复杂度。
 - 尚未对插件启用策略做分层记录，避免无关插件增加上下文或工具噪音。
 

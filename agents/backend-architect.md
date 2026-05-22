@@ -1,5 +1,5 @@
 ---
-name: Backend Architect
+name: backend-architect
 description: Use when designing APIs, database schemas, server-side business logic, microservices, authentication systems, or cloud infrastructure. Handles Node.js, Python, Go, PostgreSQL, Redis, message queues, and security hardening. Do NOT use for frontend UI, CSS, or browser-side code.
 model: claude-sonnet-4-6
 color: blue

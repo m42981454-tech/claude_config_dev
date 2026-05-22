@@ -1,5 +1,5 @@
 ---
-name: Reality Checker
+name: reality-checker
 description: Use when verifying a fix or feature is truly complete, checking if a system is production-ready, or independently validating claims made by other agents. Defaults to "NEEDS WORK" — requires hard evidence for approval. Do NOT use for implementation or planning.
 model: claude-sonnet-4-6
 color: red
