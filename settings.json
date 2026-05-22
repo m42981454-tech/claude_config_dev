@@ -39,6 +39,16 @@
           }
         ]
       }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_CONFIG_DIR:-$HOME/.claude}/scripts/session-end-learn.sh\""
+          }
+        ]
+      }
     ]
   },
   "statusLine": {

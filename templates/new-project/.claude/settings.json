@@ -38,11 +38,31 @@
     ],
     "SessionStart": [
       {
+        "_comment": "H5 — agent loader: .enabled から缺失 agent を项目内 .claude/agents に复制；正常无输出",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd); bash \"$ROOT/.claude/scripts/agent-loader.sh\""
+          }
+        ]
+      },
+      {
         "_comment": "H6 — 会话起 work state 摘要 + PROGRESS 行数检查",
         "hooks": [
           {
             "type": "command",
             "command": "cd \"$(git rev-parse --show-toplevel 2>/dev/null || pwd)\" 2>/dev/null; BRANCH=$(git branch --show-current 2>/dev/null || echo unknown); LAST3=$(git log --oneline -3 2>/dev/null | head -3 | tr '\\n' '|' | sed 's/|$//'); MAIN_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's|refs/remotes/origin/||' || echo main); AHEAD=$(git rev-list --count origin/$MAIN_BRANCH..HEAD 2>/dev/null || echo 0); PROGRESS_PATH=\"[PROGRESS_PATH]\"; if [ \"$PROGRESS_PATH\" = \"[PROGRESS_PATH]\" ] || [ ! -f \"$PROGRESS_PATH\" ]; then PROGRESS_PATH=$(find . -maxdepth 3 -iname 'progress.md' 2>/dev/null | head -1); fi; LINES=$(wc -l < \"$PROGRESS_PATH\" 2>/dev/null || echo 0); OPEN=$(gh issue list --state open 2>/dev/null | wc -l || echo 0); WARN=\"\"; if [ \"$LINES\" -gt 250 ]; then WARN=\" | ⚠️ PROGRESS $LINES lines > 250 — 触发归档\"; fi; echo \"{\\\"systemMessage\\\":\\\"Branch: $BRANCH | ahead $AHEAD | open issues: $OPEN | PROGRESS: $LINES lines$WARN | last: $LAST3\\\"}\"; exit 0"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "_comment": "H7 — 本地 session learning 记录；只写 .claude/session-memory/，不调用模型，不输出上下文",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd); bash \"$ROOT/.claude/scripts/session-end-learn.sh\""
           }
         ]
       }

@@ -41,6 +41,7 @@ Thumbs.db
 .last-cleanup
 reset-date.conf
 session-env/
+session-memory/
 sessions/
 tasks/
 plans/
