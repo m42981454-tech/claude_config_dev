@@ -18,13 +18,21 @@
 
 ---
 
-## Step 2 — 运行初始化脚本
+## Step 2 — 运行初始化
+
+**推荐（Claude Code 环境）**：
+
+```
+/project:init
+```
+
+Claude 会读取 `project.env`，智能替换所有占位符，清理未用的技术栈行，并推荐 agent 配置。
+
+**备选（无 Claude Code / 纯 shell 环境）**：
 
 ```bash
 bash init.sh
 ```
-
-脚本会自动把 `project.env` 里的变量替换到所有 md 文件的占位符中。
 
 ---
 

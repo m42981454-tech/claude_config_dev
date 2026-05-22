@@ -13,26 +13,26 @@
 - **未来主线**: `main`（首次 merge 到 main 之后切换）
 - 任何时刻只有**一条**主线；判断方法：看最新 sprint 文档头部声明的"当前主线"，或 `git log --graph` 上承载最近 merge commit 的那条
 
-### 7.2 强制规则：**不直接 commit 到主线**
+### 7.2 强制规则：**不直接 commit 到主线 / 主线 merge 为人工专属**
 
 - ❌ 不允许在主线（当前 = `[MAIN_BRANCH]`）上直接 `git commit`
+- ❌ **AI 不得执行向主线的 merge**——`git checkout [MAIN_BRANCH] && git merge ...` 为人工专属操作；AI 收到此类请求必须拒绝（H1 hook 会拦截）
 - ✅ 所有改动必须先从主线**最新 HEAD** 开新分支：
   - sprint 任务：`[MAIN_BRANCH].ph<N>`（如 `[MAIN_BRANCH].ph13`）
   - bug 修复：`[MAIN_BRANCH].ph<N>.fix<M>`（如 `[MAIN_BRANCH].ph13.fix1`）
   - 杂项 / 文档 / 配置：`[MAIN_BRANCH].chore.<topic>`（如 `[MAIN_BRANCH].chore.handoff-update`）
-- ✅ 切换分支前先 `git status` 确认 clean，再 `git checkout [MAIN_BRANCH] && git pull`（如有远端）再 `git checkout -b <new>`
-- ✅ merge 回主线统一用 `--no-ff -m "..."`，保留分支拓扑便于回溯
+- ✅ AI 可管理工作分支（子分支 → 工作分支），必须使用 `--no-ff` merge
+- ✅ 切换分支前先 `git status` 确认 clean，再 `git checkout -b <new>`（不在主线上直接操作）
 - ✅ merge 后**立刻**删本地临时分支（`git branch -d <name>`）
 - ❌ 不 push 远端（除非用户明示）
 - ❌ 不 amend；不 rebase 已 merge 的历史；不 force push
 
 > 🤖 **可选 git hook 机器守门**: `.githooks/pre-commit` 直接拒绝主线 commit（详 §7.7.2）
 
-### 7.3 例外（极少数允许直接 commit 主线的场景）
+### 7.3 例外
 
-- 只在用户**明确**指示"直接到 [MAIN_BRANCH]"时
-- 紧急 hotfix 且时间窗口小于 1 分钟（仍建议 fix 分支）
-- 其余情况一律走分支
+- 直接 commit 到主线：只在用户**明确**指示"直接到 [MAIN_BRANCH]"时（极少数）
+- **向主线 merge：无例外**——即使用户明确要求，AI 也应拒绝并引导用户手动执行
 
 ### 7.4 子分支生命周期
 
