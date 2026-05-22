@@ -1,9 +1,5 @@
 {
   "permissions": {
-    "allow": [
-      "Bash(uv --version)",
-      "Bash(where.exe uv *)",
-      "Bash(uv python *)"
-    ]
+    "allow": []
   }
 }
