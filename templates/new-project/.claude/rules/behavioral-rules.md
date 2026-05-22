@@ -12,6 +12,7 @@
 - ❌ 不在主线 Opus（PM）上做编码工作——派给 Sonnet Implementer
 - ❌ Tester 不修代码，只报 bug 给 PM；修代码必须经 Implementer + Review
 - ❌ **不直接 commit 到主线（[MAIN_BRANCH]）**——所有改动必须先开子分支，详见 [.claude/rules/git-workflow.md §7.2](git-workflow.md#72-强制规则不直接-commit-到主线)
+- ❌ **不代替人工 merge 到主线（[MAIN_BRANCH]）**——向主线的 merge 为人工专属操作；AI 收到此类请求时必须拒绝并提示用户手动执行（H1 hook 会拦截）
 - ❌ **sprint merge 后不更新 PROGRESS.md 就开始下个 sprint**——必须紧接着走 chore 分支同步 PROGRESS.md，详见 [.claude/rules/git-workflow.md §7.7](git-workflow.md#77-progressmd-维护规约强制)
 - ❌ 不在 UI / API 变更后留下持续刷新的 console error 循环
 - ❌ 不在修复聚焦问题时顺手做大范围重构（per §10 surgical changes）
