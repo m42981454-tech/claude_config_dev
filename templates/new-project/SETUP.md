@@ -1,94 +1,123 @@
-# 新项目初始化手顺
+# New Project Setup
 
-> 把 `new-project/` 模板复制到目标目录后，按以下步骤完成初始化。
-> 完成后删除本文件（`SETUP.md`）、`project.env`、`init.sh`。
+Use this checklist after copying `templates/new-project/` into a real project.
 
----
+## 0. Prerequisites
 
-## Step 1 — 填写 `project.env`
+Required tools:
 
-打开根目录的 `project.env`，按注释说明填写所有变量：
-
-| 变量 | 影响的文件 |
+| Tool | Why |
 |---|---|
-| `PROJECT_NAME` / `PHASE` / `MAIN_BRANCH` | `CLAUDE.md`、`git-workflow.md`、`behavioral-rules.md` |
-| `BACKEND_DIR` / `FRONTEND_DIR` | `stack-backend.md`、`stack-frontend.md` 的 path-scoped 触发路径 |
-| `BACKEND_STACK` / `FRONTEND_STACK` / `INFRA` | `CLAUDE.md` 技术栈摘要 |
-| 后端/前端技术栈详情 | `stack-backend.md` / `stack-frontend.md` 技术栈列表 |
+| Git | repository initialization and hooks |
+| Git Bash | runs `init.sh`, git hooks, and Claude Code shell hooks on Windows |
+| jq | parses Claude Code hook payloads safely |
 
----
+On Windows, make sure Git Bash is available as `bash` before the WSL launcher. If `where bash` shows `C:\Windows\System32\bash.exe` first, move Git Bash earlier in `PATH` or call Git Bash explicitly while validating.
 
-## Step 2 — 运行初始化
+## 1. Fill `project.env`
 
-**推荐（Claude Code 环境）**：
+Edit `project.env` first. It controls project name, main branch, repository owner/name, directory names, and stack summaries.
 
-```
-/project:init
-```
+Important fields:
 
-Claude 会读取 `project.env`，智能替换所有占位符，清理未用的技术栈行，并推荐 agent 配置。
+| Field | Used By |
+|---|---|
+| `PROJECT_NAME`, `PHASE`, `MAIN_BRANCH` | `CLAUDE.md`, git workflow rules, progress |
+| `REPO_OWNER`, `REPO_NAME` | issue examples and repo references |
+| `BACKEND_DIR`, `FRONTEND_DIR` | path-scoped stack rules |
+| stack fields | backend/frontend/project context rules |
+| `TASK_QUEUE`, `I18N` | optional stack rows; delete rows later if unused |
 
-**备选（无 Claude Code / 纯 shell 环境）**：
+## 2. Initialize
+
+Preferred shell path:
 
 ```bash
 bash init.sh
 ```
 
----
+Claude Code path:
 
-## Step 3 — 手动收尾（脚本无法自动化的部分）
-
-1. **`stack-backend.md`** — 删除不适用的技术行（如无 Redis、无 Celery）；补充测试命令、约定、反模式
-2. **`stack-frontend.md`** — 同上；删除无关技术行（如无 i18n）
-3. **`.claude/agents/.enabled`** — 参照 `.enabled.example` 按需启用 agent
-4. 若项目无后端 → 删除 `stack-backend.md`；若无前端 → 删除 `stack-frontend.md`
-
----
-
-## Step 4 — 个人本地覆盖（可选）
-
-如需在本机添加个人专属的 Claude 指令（不想提交到 git），创建：
-
-```bash
-touch CLAUDE.local.md
+```text
+/project:init
 ```
 
-此文件已在 `.gitignore` 中排除，Claude Code 会在项目 `CLAUDE.md` 之后自动加载它。
-适合写：个人快捷命令、临时调试偏好、机器特定路径等。
+The command performs the same replacement steps and points you to validation.
 
----
+## 3. Review Project-Specific Files
 
-## Step 5 — 清理并首次 commit
+After initialization:
+
+1. Review `.claude/rules/stack-backend.md` and delete unused rows.
+2. Review `.claude/rules/stack-frontend.md` and delete unused rows.
+3. Delete the backend or frontend stack rule if the project does not have that side.
+4. Review `.claude/agents/.enabled`; keep only optional agents needed by this project.
+5. Review `progress.md` and update the initial work state.
+
+## 4. Install Git Hooks
+
+After `git init`:
+
+```bash
+bash .githooks/install.sh
+```
+
+This sets:
+
+```text
+core.hooksPath=.githooks
+```
+
+The pre-commit hook blocks direct commits to protected main branches while allowing merge, cherry-pick, and revert commits.
+
+## 5. Validate
+
+After initialization and cleanup:
+
+```bash
+.claude/scripts/validate.sh
+```
+
+On Windows PowerShell:
+
+```powershell
+.claude\scripts\validate.ps1
+```
+
+Template maintainers can validate before cleanup with:
+
+```bash
+.claude/scripts/validate.sh --force
+```
+
+```powershell
+.claude\scripts\validate.ps1 -Force
+```
+
+## 6. Clean Up Before First Commit
+
+Delete template-only files unless your team intentionally keeps them:
 
 ```bash
 rm project.env init.sh SETUP.md
-git init
-bash .githooks/install.sh   # git init 之后才能写入 .git/config
-git add .
-git commit -m "chore: init project from template"
 ```
 
-> `install.sh` 必须在 `git init` 之后运行，否则 `.git/config` 尚不存在，hook 配置无处写入。
-> 安装后直接向主线 commit 会被 `pre-commit` hook 自动拦截。
+Then create the first real project commit from a work branch, not directly from the protected main branch.
 
-重启 Claude Code，验证 SessionStart 摘要显示正确的分支和 PROGRESS 行数。
+## 7. Agent Files
 
----
+Default template agents are stored in:
 
-## 附录：日常 Context 管理速查
+```text
+.claude/agents/_available/
+```
 
-| 命令 | 场景 |
-|---|---|
-| `/clear` | 任务切换时完全重置 context |
-| `/compact Focus on <重点>` | 长会话压缩，指定保留内容 |
-| `/btw <问题>` | 快速查询，不污染对话历史 |
-| `/rename <名称>` | 命名当前 session（多任务时易区分）|
-| `claude --continue` | 续接最近一次 session |
-| `claude --resume` | 从列表选择历史 session 续接 |
-| `Esc` | 中断当前操作但保留 context |
-| `Esc+Esc` | 回滚到上一个检查点 |
+They are disabled by default. To activate one:
 
----
+```bash
+cp .claude/agents/_available/api-tester.md .claude/agents/
+```
 
-> **stack-*.md 占位符说明**：若某个变量值暂时不确定，可先在 `project.env` 里写一个占位值，
-> 脚本跑完后再手动修改对应文件中的那一行。
+Or create `.claude/agents/.enabled` from `.enabled.example` and let the SessionStart loader copy enabled shared agents from the configured user-level pool.
+
+See `.claude/agents/README.md` for details.
