@@ -35,11 +35,9 @@ paths:
 
 ## 测试命令
 
-<!-- 填写实际命令，保证 Claude 能直接复制运行 -->
+<!-- 命令假设从项目根运行；本 rule path-scoped 到子树，Claude 已知上下文 -->
 
 ```bash
-cd frontend                             # ← 改为实际前端目录
-
 tsc --noEmit                            # ← [type-check-command]：类型检查（JS 项目删此行）
 jest                                    # ← [unit-test-command]：单元测试，如 vitest / npm run test
 playwright test                         # ← [e2e-command]：E2E 测试，如 cypress run / npx playwright test

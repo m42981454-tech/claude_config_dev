@@ -36,11 +36,9 @@ paths:
 
 ## 测试命令
 
-<!-- 填写实际命令，保证 Claude 能直接复制运行 -->
+<!-- 命令假设从项目根运行；本 rule path-scoped 到子树，Claude 已知上下文 -->
 
 ```bash
-cd backend                              # ← 改为实际后端目录
-
 pytest                                  # ← [test-command]：全量测试
 pytest tests/path/to/test_file.py       # ← 单文件测试（路径格式按实际调整）
 python -c "import app"                  # ← [compile-check-command]：导入/编译检查，无则删此行
