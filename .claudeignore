@@ -1,2 +1,3 @@
 # Prevent template instructions from being auto-loaded into the current user-level context.
 templates/
+agents.bak*/
