@@ -20,44 +20,25 @@ paths:
 | 下一步做什么? | 主 PROGRESS §🔄 当前进行中 + §🔴 待做 |
 | 哪些等我决策? | 主 PROGRESS §👤 等用户决策 |
 | 哪些等我验收? | 主 PROGRESS §🟡 已 merge 待验收 |
-| 已闭环 sprint / 决策 | [`PROGRESS_done.md`](../../PROGRESS_done.md)（按需创建） |
-| 未来 roadmap / GA 后 | [`PROGRESS_roadmap.md`](../../PROGRESS_roadmap.md)（按需创建） |
+| 已闭环 sprint / 决策 | `PROGRESS_done.md`（按需创建） |
+| 未来 roadmap / GA 后 | `PROGRESS_roadmap.md`（按需创建） |
 | 历史做过啥? | 主 PROGRESS §🔄 完成的转 PROGRESS_done + commit log |
 | 架构契约 / 规约? | 本 `.claude/rules/` 各 sub-file + 主 `CLAUDE.md` + `design/` |
-| 全文档导航 | [`docs/INDEX.md`](../../docs/INDEX.md)（按需创建） |
+| 全文档导航 | `docs/INDEX.md`（按需创建） |
 | 事故复盘 | [`docs/postmortems/README.md`](../../docs/postmortems/README.md)（按需创建） |
 
 ---
 
 ## 📐 PM 维护流程
 
-### 每完成一个 sprint（PROGRESS 作为 sprint 分支最后一个 commit）
+### 每完成一个 sprint —— 源自 [`git-workflow.md §7.7`](git-workflow.md)
 
-**新工作流（推荐）**：将 PROGRESS update 作为 sprint 分支的**最后一个 commit**，与代码改动**一次 merge** 同时入主线 —— 减少不必要的 chore merge 操作。
+完整流程（sprint 分支末尾 commit progress.md → `--no-ff` merge → pre-merge 自检清单 → chore.progress 例外路径）见 [`git-workflow.md §7.7`](git-workflow.md)。
 
-1. 在 **sprint 分支**（`[MAIN_BRANCH].<topic>`）上，实装 / Review / Test 全部完成后：
-2. 直接在 sprint 分支上更新主 `progress.md`：
-   - §🔄 当前进行中 → 移除该 sprint
-   - §🟡 待用户验收 → 添加新验收点
-   - §🔄 完成事件简述（若需要细节，留 link 到 docs/ sprint 专辑）
-3. 顶部 codeblock `[最后更新]` / `[当前 sprint]` 更新（**不写 hash**，per [git-workflow.md §7.7.1](git-workflow.md)）
-4. 如有新待办 → 主 PROGRESS §🔴 或 `PROGRESS_roadmap.md` 对应分组
-5. `git commit -m "docs(progress): mark <topic> done"` —— 这是 sprint 分支的**最后一个 commit**
-6. 回主线 `--no-ff` merge 一次（包含 code + progress），删 sprint 分支，**不 push**（除非用户明示）
+本文件**不重复**那段，只列 PROGRESS 维护的**专属约定**（git-workflow.md 不涉及的）：
 
-**Pre-merge 自检**（PM 在合并前必看）:
-
-```bash
-# 检查 sprint 分支 last commit 是否包含 progress.md
-git log -1 --name-only [MAIN_BRANCH].<topic> | grep -i progress
-```
-
-若 last commit 未包含 progress.md → 在 sprint 分支上追加 progress commit 后再 merge。
-
-**例外（允许单独 chore.progress 分支）**:
-
-- 紧急 hotfix：sprint 已 merge，事后才发现需要补 PROGRESS → `[MAIN_BRANCH].chore.progress-<topic>`
-- 跨 sprint 总结性整理（归档触发后批量调整）→ `[MAIN_BRANCH].chore.progress-archive`
+- **§🟡 待用户验收**：用户验收后划掉一行；PM 在下次 chore 加 `✅` 前缀；满 20 项触发归档（见下方 §"滚动归档触发"）
+- **§👤 等用户决策**：仅 PROGRESS 用，git-workflow.md 不涉及
 
 ### 滚动归档触发（保持主 PROGRESS < 200 行）
 
@@ -90,15 +71,15 @@ git log -1 --name-only [MAIN_BRANCH].<topic> | grep -i progress
 - 必经双签：Code Reviewer + Tester
 - 按需追加签字：Security / Reality Checker / SRE 等（per 触发决策表）
 
-### Sub-agent / Sonnet 派发原则
+### Sub-agent 派发原则
 
-- PM 主线跑长任务（pytest 全量 / docker build）：避免 Sonnet token 限制中途卡
-- Sonnet 只做实装 + 局部测试；不跑 pytest 全量
+- PM 主线跑长任务（pytest 全量 / docker build）：避免 subagent token 限制中途卡
+- Subagent 只做实装 + 局部测试；不跑 pytest 全量
 - 重构涉及 module-level 符号迁移必须同步迁移测试 `monkeypatch.setattr("module.symbol")` path
 - 并发 agent 显式 base 隔离；agent prompt 起手 `git fetch && git checkout [MAIN_BRANCH]`（防 stale base bug）
 - 派 future doc agent 必须含 sprint 完成清单 prerequisite
 - bug 诊断必须看完整 traceback / response body
-- Tester 报 bug 用 `gh issue create` 自动建 issue（详 git-workflow.md §7.9）
+- Tester subagent 报 bug 用 `gh issue create` 自动建 issue（详 git-workflow.md §7.9）
 
 ---
 

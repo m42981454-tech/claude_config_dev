@@ -5,18 +5,18 @@
 
 ---
 
-**核心思想**: PM（Opus）主线编排，通过 `Agent({subagent_type: "..." })` 派 plugin sub-agents 并发执行。每个 agent 有专属 system prompt + tool subset + 触发场景 description，**派单更精准**（不用在 prompt 内重复 "作为 X..." persona）。
+**核心思想**: PM（主线决策角色）通过 `Agent({subagent_type: "..." })` 派 plugin sub-agents 并发执行。每个 agent 有专属 system prompt + tool subset + 触发场景 description，**派单更精准**（不用在 prompt 内重复 "作为 X..." persona）。
 
 ⚠️ **subagent_type 用 friendly name（Title Case）而非 file name（kebab-case）** — 详 §2.7 顶部注释。`~/.claude/agents/` 文件名是 `engineering-backend-architect.md`，但 Agent tool 注册的 subagent_type 是 `"Backend Architect"`。
 
 **前置**: `~/.claude/plugins/agency-agents/` plugin（或对等 agent catalog）已加载，提供 50+ agents 自动 register 到 `~/.claude/agents/`：engineering-* / testing-* / product-* / project-management-* / specialized-*。Claude Code 重启后才识别。
 
-### 2.1 PM（Opus 主线）
+### 2.1 PM（主线决策角色）
 
 - 拆任务、并行派单、整合产出、与用户对齐、决策、Go/No-Go 签字
 - §7.9 Issue-First gate 守门员（开 sprint 子分支前必先 `gh issue create`）
-- 主线 Opus 不另开 Agent，不在主线做编码工作
-- 需 spec→task 拆解 / discovery / PRD / 路线图细化时，派 `Product Manager` sub-agent 辅助（`model: opus`）— 决策与编排权仍在主线 Opus
+- PM 主线不另开 Agent，不在主线做编码工作
+- 需 spec→task 拆解 / discovery / PRD / 路线图细化时，派 `Product Manager` sub-agent 辅助（推荐 `model: opus` 或当前最强决策 model）— 决策与编排权仍在主线 PM
 
 ### 2.2 必经组（每 sprint 默认走）
 
@@ -81,7 +81,7 @@
 
 > **重要 — subagent_type 命名约定**: `~/.claude/agents/` 下 file 是 kebab-case（`engineering-backend-architect.md`），但 plugin **registry 把 friendly name 暴露给 Agent tool** = `"Backend Architect"`（Title Case 去 prefix）。**派单时用 Title Case 名字**，kebab-case file name **不会被识别**。
 
-> **Model 锁定原则**: plugin agent 无 `model:` frontmatter 默认继承 PM Opus（每 dispatch 成本高）。推荐 3-layer 架构 + `model:` frontmatter 锁:
+> **Model 锁定原则**: plugin agent 无 `model:` frontmatter 默认继承 PM 模型（每 dispatch 成本高）。推荐 3-layer 架构 + `model:` frontmatter 锁:
 >
 > ```
 > ~/.claude/plugins/agency-agents/   <N>.md  CATALOG（source of truth, git clone）

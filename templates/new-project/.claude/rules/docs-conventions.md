@@ -99,7 +99,7 @@ paths:
 ### 2.4 链接规约
 
 - **GitHub issue / PR**: `[#N](<issue-url>)`（repo 名必含，跨项目可读）
-- **本 repo 内其他 doc**: `[../foo.md](../foo.md)` 或 `path/foo.md`（相对路径）
+- **本 repo 内其他 doc**: `` `../foo.md` `` 或 `path/foo.md`（相对路径）
 - **commit hash**: 反引号包，可附 link
 - **外部 URL**: 总是用 markdown link 格式，不裸贴
 
