@@ -10,7 +10,7 @@ if [ -z "$REPO_ROOT" ]; then
     exit 1
 fi
 
-git config core.hooksPath .githooks
+git config core.hooksPath "$REPO_ROOT/.githooks"
 chmod +x "$REPO_ROOT/.githooks/pre-commit"
 
 echo "✅ git hooks 已安装（core.hooksPath = .githooks）"
