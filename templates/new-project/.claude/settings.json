@@ -1,44 +1,44 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
-  "_comment": "Project-level Claude Code hooks (template). 主线分支与 PROGRESS 路径通过 git/gh CLI 自动检测；如自动检测失败，把 [PROGRESS_PATH] 改成项目实际值。",
+  "_comment": "Project-level Claude Code hooks for the new-project template. Replace [PROGRESS_PATH] with the real project path when needed.",
   "hooks": {
     "PreToolUse": [
       {
-        "_comment": "H1 — 拦危险 Bash cmd: 1) git hook bypass; 2) force-push main; 3) rm -rf 保护目录; 4) chained pipe with git checkout/merge",
+        "_comment": "H1: block dangerous Bash patterns: git hook bypass, force push to main, protected recursive deletes, chained checkout/merge pipes, and AI merge to main.",
         "matcher": "Bash",
         "hooks": [
           {
             "type": "command",
-            "command": "INPUT=$(cat); CMD=$(echo \"$INPUT\" | jq -r '.tool_input.command // \"\"'); if echo \"$CMD\" | grep -qE '^[[:space:]]*(echo|printf|cat[[:space:]]+<<)'; then echo '{}'; exit 0; fi; if echo \"$CMD\" | grep -qE '\\bgit[[:space:]]+(commit|push|merge|rebase|stash|tag|cherry-pick|am|revert)\\b.*(--no-verify|--no-gpg-sign|-c[[:space:]]+commit\\.gpgsign=false)\\b'; then echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\"},\"systemMessage\":\"BLOCKED: git hook bypass forbidden. Investigate root cause.\"}'; exit 0; fi; MAIN_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's|refs/remotes/origin/||' || echo main); if echo \"$CMD\" | grep -qE \"git[[:space:]]+push.*-f.*\\\\b(main|$MAIN_BRANCH)\\\\b\"; then echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\"},\"systemMessage\":\"BLOCKED: force-push to main branch forbidden.\"}'; exit 0; fi; if echo \"$CMD\" | grep -qE 'rm[[:space:]]+-rf[[:space:]]+[^[:space:]]*(\\.claude|docs|migrations)'; then echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\"},\"systemMessage\":\"BLOCKED: rm -rf protected dirs (.claude/docs/migrations).\"}'; exit 0; fi; if echo \"$CMD\" | grep -qE 'git[[:space:]]+(checkout|merge|rebase|reset)\\b.*\\|[[:space:]]*(tail|head|awk)\\b'; then echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\"},\"systemMessage\":\"BLOCKED: chained pipe with git checkout/merge eats fatal exit code. Use independent Bash calls.\"}'; exit 0; fi; CURRENT_BRANCH=$(git branch --show-current 2>/dev/null || echo \"\"); if echo \"$CMD\" | grep -qE 'git[[:space:]]+merge\\b' && { [ \"$CURRENT_BRANCH\" = \"$MAIN_BRANCH\" ] || echo \"$CMD\" | grep -qE \"git[[:space:]]+(checkout|switch)[[:space:]]+$MAIN_BRANCH([[:space:]]|&&|;|$)\"; }; then echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\"},\"systemMessage\":\"BLOCKED: merge to main ($MAIN_BRANCH) is human-only. AI must not execute — ask the human to run it manually.\"}'; exit 0; fi; echo '{}'; exit 0"
+            "command": "INPUT=$(cat); CMD=$(printf '%s' \"$INPUT\" | jq -r '.tool_input.command // \"\"' 2>/dev/null || true); MAIN_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's|refs/remotes/origin/||' || echo main); CURRENT_BRANCH=$(git branch --show-current 2>/dev/null || echo \"\"); if echo \"$CMD\" | grep -qE '\\bgit[[:space:]]+(commit|push|merge|rebase|stash|tag|cherry-pick|am|revert)\\b.*(--no-verify|--no-gpg-sign|-c[[:space:]]+commit\\.gpgsign=false)\\b'; then echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\"},\"systemMessage\":\"BLOCKED: git hook bypass is forbidden. Fix the underlying issue.\"}'; exit 0; fi; if echo \"$CMD\" | grep -qE \"git[[:space:]]+push.*-f.*\\\\b(main|$MAIN_BRANCH)\\\\b\"; then echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\"},\"systemMessage\":\"BLOCKED: force-push to the main branch is forbidden.\"}'; exit 0; fi; if echo \"$CMD\" | grep -qE 'rm[[:space:]]+-rf[[:space:]]+[^[:space:]]*(\\.claude|docs|migrations)'; then echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\"},\"systemMessage\":\"BLOCKED: recursive delete of protected directories (.claude/docs/migrations).\"}'; exit 0; fi; if echo \"$CMD\" | grep -qE 'git[[:space:]]+(checkout|switch|merge|rebase|reset)\\b.*\\|[[:space:]]*(tail|head|awk)\\b'; then echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\"},\"systemMessage\":\"BLOCKED: chained pipe can hide git checkout/merge failures. Use separate commands.\"}'; exit 0; fi; if echo \"$CMD\" | grep -qE 'git[[:space:]]+merge\\b' && { [ \"$CURRENT_BRANCH\" = \"$MAIN_BRANCH\" ] || echo \"$CMD\" | grep -qE \"git[[:space:]]+(checkout|switch)[[:space:]]+$MAIN_BRANCH([[:space:]]|&&|;|$)\"; }; then echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"deny\"},\"systemMessage\":\"BLOCKED: merge to main is human-only. Ask the human to run it manually.\"}'; exit 0; fi; echo '{}'; exit 0"
           }
         ]
       },
       {
-        "_comment": "H2-pre — sprint merge 前检查：sprint 分支 last commit 是否触及 progress.md（新工作流：progress update 应作为 sprint 分支最后一个 commit）。未触及则警告（不 deny，允许 design-only 等场景）。",
+        "_comment": "H2-pre: before a sprint no-ff merge, warn if the source branch last commit does not touch progress.md.",
         "matcher": "Bash",
         "hooks": [
           {
             "type": "command",
-            "command": "INPUT=$(cat); CMD=$(echo \"$INPUT\" | jq -r '.tool_input.command // \"\"'); MAIN_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's|refs/remotes/origin/||' || echo main); if echo \"$CMD\" | grep -qE \"git[[:space:]]+merge[[:space:]]+--no-ff[[:space:]]+$MAIN_BRANCH\\\\.\"; then SPRINT_BRANCH=$(echo \"$CMD\" | grep -oE \"$MAIN_BRANCH\\\\.[^[:space:]\\\"']+\" | head -1); if [ -n \"$SPRINT_BRANCH\" ]; then LAST_FILES=$(git log -1 --name-only --pretty=format: \"$SPRINT_BRANCH\" 2>/dev/null | grep -v '^$'); if ! echo \"$LAST_FILES\" | grep -qiE '(^|/)progress\\.md$'; then echo '{\"systemMessage\":\"⚠️ Pre-merge check: sprint branch '\"'\"'\"$SPRINT_BRANCH\"'\"'\"' last commit does not touch progress.md. Per workflow: update progress.md as the FINAL commit on sprint branch before merging. Continue if intentional (e.g. design-only sprint or chore branch).\"}'; exit 0; fi; fi; fi; echo '{}'; exit 0"
+            "command": "INPUT=$(cat); CMD=$(printf '%s' \"$INPUT\" | jq -r '.tool_input.command // \"\"' 2>/dev/null || true); MAIN_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's|refs/remotes/origin/||' || echo main); if echo \"$CMD\" | grep -qE \"git[[:space:]]+merge[[:space:]]+--no-ff[[:space:]]+$MAIN_BRANCH\\\\.\"; then SPRINT_BRANCH=$(echo \"$CMD\" | grep -oE \"$MAIN_BRANCH\\\\.[^[:space:]\\\"']+\" | head -1); if [ -n \"$SPRINT_BRANCH\" ]; then LAST_FILES=$(git log -1 --name-only --pretty=format: \"$SPRINT_BRANCH\" 2>/dev/null | grep -v '^$'); if ! echo \"$LAST_FILES\" | grep -qiE '(^|/)progress\\.md$'; then echo '{\"systemMessage\":\"Pre-merge check: sprint branch last commit does not touch progress.md. Update progress.md as the final sprint commit unless this is an intentional exception.\"}'; exit 0; fi; fi; fi; echo '{}'; exit 0"
           }
         ]
       }
     ],
     "PostToolUse": [
       {
-        "_comment": "H2-post — sprint merge 后兜底：若 merge commit 未触及 progress.md（pre 检查被跳过 / sprint 分支没更新就 merge 了），提示开 chore.progress 补救（per progress-conventions.md 例外条款）",
+        "_comment": "H2-post: after sprint no-ff merge, warn if merged files did not include progress.md.",
         "matcher": "Bash",
         "hooks": [
           {
             "type": "command",
-            "command": "INPUT=$(cat); CMD=$(echo \"$INPUT\" | jq -r '.tool_input.command // \"\"'); MAIN_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's|refs/remotes/origin/||' || echo main); if echo \"$CMD\" | grep -qE \"git[[:space:]]+merge[[:space:]]+--no-ff[[:space:]]+$MAIN_BRANCH\\\\.\"; then LAST_FILES=$(git log -1 --name-only --pretty=format: HEAD 2>/dev/null | grep -v '^$'); if ! echo \"$LAST_FILES\" | grep -qiE '(^|/)progress\\.md$'; then echo '{\"systemMessage\":\"⚠️ Merge done but does not include progress.md update. Open chore.progress branch to补救 (per progress-conventions.md 例外条款).\"}'; exit 0; fi; fi; echo '{}'; exit 0"
+            "command": "INPUT=$(cat); CMD=$(printf '%s' \"$INPUT\" | jq -r '.tool_input.command // \"\"' 2>/dev/null || true); MAIN_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's|refs/remotes/origin/||' || echo main); if echo \"$CMD\" | grep -qE \"git[[:space:]]+merge[[:space:]]+--no-ff[[:space:]]+$MAIN_BRANCH\\\\.\"; then LAST_FILES=$(git log -1 --name-only --pretty=format: HEAD 2>/dev/null | grep -v '^$'); if ! echo \"$LAST_FILES\" | grep -qiE '(^|/)progress\\.md$'; then echo '{\"systemMessage\":\"Merge completed without progress.md changes. If this was not intentional, open a chore.progress branch to repair the progress record.\"}'; exit 0; fi; fi; echo '{}'; exit 0"
           }
         ]
       }
     ],
     "SessionStart": [
       {
-        "_comment": "H5 — agent loader: .enabled から缺失 agent を项目内 .claude/agents に复制；正常无输出",
+        "_comment": "H5: load enabled project agents from .claude/agents/.enabled with quiet output.",
         "hooks": [
           {
             "type": "command",
@@ -47,18 +47,18 @@
         ]
       },
       {
-        "_comment": "H6 — 会话起 work state 摘要 + PROGRESS 行数检查",
+        "_comment": "H6: print one short work-state line. Keep this concise because hook output enters context.",
         "hooks": [
           {
             "type": "command",
-            "command": "cd \"$(git rev-parse --show-toplevel 2>/dev/null || pwd)\" 2>/dev/null; BRANCH=$(git branch --show-current 2>/dev/null || echo unknown); LAST3=$(git log --oneline -3 2>/dev/null | head -3 | tr '\\n' '|' | sed 's/|$//'); MAIN_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's|refs/remotes/origin/||' || echo main); AHEAD=$(git rev-list --count origin/$MAIN_BRANCH..HEAD 2>/dev/null || echo 0); PROGRESS_PATH=\"[PROGRESS_PATH]\"; if [ \"$PROGRESS_PATH\" = \"[PROGRESS_PATH]\" ] || [ ! -f \"$PROGRESS_PATH\" ]; then PROGRESS_PATH=$(find . -maxdepth 3 -iname 'progress.md' 2>/dev/null | head -1); fi; LINES=$(wc -l < \"$PROGRESS_PATH\" 2>/dev/null || echo 0); OPEN=$(gh issue list --state open 2>/dev/null | wc -l || echo 0); WARN=\"\"; if [ \"$LINES\" -gt 250 ]; then WARN=\" | ⚠️ PROGRESS $LINES lines > 250 — 触发归档\"; fi; echo \"{\\\"systemMessage\\\":\\\"Branch: $BRANCH | ahead $AHEAD | open issues: $OPEN | PROGRESS: $LINES lines$WARN | last: $LAST3\\\"}\"; exit 0"
+            "command": "cd \"$(git rev-parse --show-toplevel 2>/dev/null || pwd)\" 2>/dev/null; BRANCH=$(git branch --show-current 2>/dev/null || echo unknown); MAIN_BRANCH=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's|refs/remotes/origin/||' || echo main); AHEAD=$(git rev-list --count origin/$MAIN_BRANCH..HEAD 2>/dev/null || echo 0); PROGRESS_PATH=\"[PROGRESS_PATH]\"; if [ \"$PROGRESS_PATH\" = \"[PROGRESS_PATH]\" ] || [ ! -f \"$PROGRESS_PATH\" ]; then PROGRESS_PATH=$(find . -maxdepth 3 -iname 'progress.md' 2>/dev/null | head -1); fi; LINES=$(wc -l < \"$PROGRESS_PATH\" 2>/dev/null || echo 0); OPEN=$(gh issue list --state open 2>/dev/null | wc -l || echo 0); echo \"{\\\"systemMessage\\\":\\\"Branch: $BRANCH | ahead main: $AHEAD | open issues: $OPEN | progress lines: $LINES\\\"}\"; exit 0"
           }
         ]
       }
     ],
     "SessionEnd": [
       {
-        "_comment": "H7 — 本地 session learning 记录；只写 .claude/session-memory/，不调用模型，不输出上下文",
+        "_comment": "H7: write local session memory without model calls or context injection.",
         "hooks": [
           {
             "type": "command",

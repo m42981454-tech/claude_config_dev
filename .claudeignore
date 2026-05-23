@@ -1,2 +1,2 @@
-# 排除模板目录，防止 templates/new-project/CLAUDE.md 被自动加载到上下文
+# Prevent template instructions from being auto-loaded into the current user-level context.
 templates/

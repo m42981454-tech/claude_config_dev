@@ -1,164 +1,109 @@
 # [PROJECT_NAME] Project Conventions
 
-> Current phase: **[PHASE]**
-> Last updated: **[DATE]**
-> Summary: [Brief project and phase description]
+> Phase: **[PHASE]**
+> Updated: **[DATE]**
+> Summary: [Brief project and current work]
 
-This file is the project-specific quick entry point. Detailed behavior, engineering, git, testing, orchestration, and documentation rules live under `.claude/rules/` and are loaded by scope.
+This is the quick entry point for Claude Code. Keep it short. Detailed behavior lives in `.claude/rules/`, commands in `.claude/commands/`, and skills in `.claude/skills/`.
 
----
-
-## 1. Repository Structure
+## 1. Repository
 
 ```text
 [project-root]/
-|-- [backend-dir]/              # [BACKEND_STACK] backend
-|   |-- app/                    # application code
-|   |-- tests/                  # backend tests
-|   `-- ...
-|-- [frontend-dir]/             # [FRONTEND_STACK] frontend
-|   |-- app/                    # pages/routes
-|   |-- components/             # UI components
-|   |-- lib/                    # utilities
-|   `-- ...
-|-- docs/                       # project documentation
-|-- progress.md                 # single source of task status
-|-- CLAUDE.md                   # this file
-`-- .claude/                    # project Claude Code configuration
+|-- [backend-dir]/        # [BACKEND_STACK] backend
+|-- [frontend-dir]/       # [FRONTEND_STACK] frontend
+|-- docs/                 # project documentation
+|-- progress.md           # current work state
+|-- CLAUDE.md             # this file
+`-- .claude/              # Claude Code project config
 ```
 
 Remove unused placeholder directories and rules during project initialization.
 
----
+## 2. Stack
 
-## 2. Technology Stack
-
-| Area | Stack | Detailed Rule |
+| Area | Stack | Rule |
 |---|---|---|
 | Backend | `[BACKEND_STACK]` | `.claude/rules/stack-backend.md` |
 | Frontend | `[FRONTEND_STACK]` | `.claude/rules/stack-frontend.md` |
-| Infrastructure | `[INFRA]` | Add `stack-infra.md` only when needed |
+| Infrastructure | `[INFRA]` | add `stack-infra.md` only when needed |
 
-When initializing a real project, replace placeholders from `project.env`, then remove `project.env`, `init.sh`, and `SETUP.md` after setup.
+After setup, replace placeholders from `project.env`, then remove `project.env`, `init.sh`, and `SETUP.md`.
 
----
+## 3. Current Work
 
-## 3. Current Task Pointer
-
-Use `progress.md` as the single source of current task state.
+Use `progress.md` as the single source for current task state.
 
 ```text
 progress.md
 ```
 
-Keep it concise and current. Detailed progress conventions are in `.claude/rules/progress-conventions.md`.
+Progress rules live in `.claude/rules/progress-conventions.md`.
 
----
+## 4. Agents
 
-## 4. Agent Layers
+Dispatch and double-signoff rules live in `.claude/rules/team-orchestration.md`.
 
-Detailed dispatch rules and double-signoff requirements live in `.claude/rules/team-orchestration.md`.
+| Layer | Agent | Use When |
+|---|---|---|
+| L2 user | `project-manager-senior` | scope, task breakdown, acceptance |
+| L2 user | `code-reviewer` | review before merge or completion |
+| L2 user | `minimal-change-engineer` | surgical fixes and contained refactors |
+| L2 user | `git-workflow-master` | branch, commit, merge, release hygiene |
+| L3 project | `agents-orchestrator` | multi-agent coordination |
+| L3 project | `backend-architect` | backend design and data/API boundaries |
+| L3 project | `frontend-developer` | UI implementation and frontend polish |
+| L3 project | `reality-checker` | evidence, readiness, gap checks |
+| L3 project | `project-management-jira-workflow-steward` | issue-first workflow and progress hygiene |
 
-### L2 User-Level Baseline Agents
+Optional shared agents are enabled via `.claude/agents/.enabled`. Use `.claude/agents/.enabled.example` as the reference list.
 
-These are expected to be available from the user-level Claude config and should not be duplicated into every project by default.
+## 5. Rules
 
-| Agent | Use When |
-|---|---|
-| `project-manager-senior` | scope, task breakdown, roadmap, acceptance criteria |
-| `code-reviewer` | review before merge or before declaring work complete |
-| `minimal-change-engineer` | small fixes, contained refactors, surgical changes |
-| `git-workflow-master` | branch, commit, merge, release, and git hygiene |
-
-### L3 Project Template Agents
-
-These live in `.claude/agents/` for new projects.
-
-| Agent | Use When |
-|---|---|
-| `agents-orchestrator` | coordinate multiple agents or route work |
-| `backend-architect` | backend design, API shape, data boundaries |
-| `frontend-developer` | UI implementation, component structure, frontend polish |
-| `reality-checker` | readiness checks, evidence, gap finding |
-| `project-management-jira-workflow-steward` | Jira-linked workflow and progress hygiene |
-
-### Optional Shared Agents
-
-Enable optional shared agents in `.claude/agents/.enabled`, one kebab-case ID per line. Missing enabled agents are copied from the shared dev pool by the SessionStart loader.
-
-Use `.claude/agents/.enabled.example` as the reference list.
-
----
-
-## 5. Rule Index
-
-Do not duplicate full rule text in this file. Use these loaded rule files instead:
-
-| Topic | Rule File |
+| Topic | Rule |
 |---|---|
 | Engineering behavior | `.claude/rules/engineering.md` |
-| Required behavior and testing | `.claude/rules/behavioral-rules.md` |
+| Required behavior and tests | `.claude/rules/behavioral-rules.md` |
 | Git workflow | `.claude/rules/git-workflow.md` |
-| Team dispatch and agent orchestration | `.claude/rules/team-orchestration.md` |
+| Team orchestration | `.claude/rules/team-orchestration.md` |
 | Architecture policy | `.claude/rules/architecture-policies.md` |
-| Documentation conventions | `.claude/rules/docs-conventions.md` |
-| Progress conventions | `.claude/rules/progress-conventions.md` |
+| Documentation | `.claude/rules/docs-conventions.md` |
+| Progress | `.claude/rules/progress-conventions.md` |
 | Rule catalog | `.claude/rules/README.md` |
 
-Path-scoped stack rules:
+Stack-specific rules:
 
-| Area | Rule File |
+| Area | Rule |
 |---|---|
 | Backend paths | `.claude/rules/stack-backend.md` |
 | Frontend paths | `.claude/rules/stack-frontend.md` |
 
----
-
-## 6. Commands, Skills, And Hooks
-
-Descriptions are defined in each command or skill file. Keep this section as an index only.
+## 6. Commands, Skills, Hooks
 
 | Type | Location |
 |---|---|
 | Commands | `.claude/commands/` |
 | Skills | `.claude/skills/` |
 | Hooks | `.claude/settings.json` |
-| Project-local scripts | `.claude/scripts/` |
+| Scripts | `.claude/scripts/` |
 
-Important hooks:
+Hook summary: `PreToolUse` blocks dangerous shell/git patterns, `PostToolUse` reminds about workflow records, `SessionStart` loads enabled agents and prints one short state line, and `SessionEnd` writes local session memory.
 
-| Hook | Purpose |
-|---|---|
-| `PreToolUse` | block dangerous git/shell patterns |
-| `PostToolUse` | remind about progress updates after workflow actions |
-| `SessionStart` | copy enabled agents and show short project state |
-| `SessionEnd` | write local session memory without calling a model |
-
----
-
-## 7. Project-Specific DON'T List
-
-General behavior rules are in `.claude/rules/behavioral-rules.md`. Keep only project-specific prohibitions here.
+## 7. Project DON'Ts
 
 - Do not commit directly to `[MAIN_BRANCH]`; use a feature or sprint branch.
 - Do not bypass hooks with `--no-verify`, `--no-gpg-sign`, or equivalent config flags.
 - Do not merge sprint branches unless `progress.md` is current.
 - Do not use `git push --force` unless a human explicitly asks for it.
-- Do not remove or rewrite `.claude/`, `docs/`, migrations, or production configuration without explicit approval.
+- Do not remove or rewrite `.claude/`, `docs/`, migrations, or production config without explicit approval.
 - Do not skip existing tests to hide failures.
 - Do not declare work complete without verification evidence.
 - Do not dispatch subagents when a small direct edit is enough.
 
----
-
-## 8. Initialization Notes
-
-For a new project:
+## 8. Setup
 
 1. Fill `project.env`.
-2. Run `/project:init` in Claude Code, or run `bash init.sh` from a shell.
+2. Run `/project:init` in Claude Code, or run `bash init.sh`.
 3. Remove unused stack rules and placeholder sections.
 4. Review `.claude/agents/.enabled`.
 5. Commit the initialized project.
-
-Full setup details live in `SETUP.md`.
