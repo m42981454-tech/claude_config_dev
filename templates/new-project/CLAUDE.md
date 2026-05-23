@@ -100,7 +100,17 @@ Hook summary: `PreToolUse` blocks dangerous shell/git patterns, `PostToolUse` re
 - Do not declare work complete without verification evidence.
 - Do not dispatch subagents when a small direct edit is enough.
 
-## 8. Setup
+## 8. Compaction Rules
+
+When compacting, always preserve:
+- Full list of modified files (with paths)
+- Current sprint name and phase (design / impl / review / test)
+- All test commands run this session and their results
+- Any architectural decisions made this session
+- Open blockers or unresolved questions
+- Error messages and their resolutions
+
+## 9. Setup
 
 1. Fill `project.env`.
 2. Run `/project:init` in Claude Code, or run `bash init.sh`.

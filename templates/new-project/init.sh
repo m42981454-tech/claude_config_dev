@@ -62,6 +62,8 @@ sub .claude/rules/project-context.md
 sub .claude/rules/stack-backend.md
 sub .claude/rules/stack-frontend.md
 sub .claude/rules/README.md
+sub .githooks/pre-commit
+sub progress.md
 
 echo "✅ 占位符替换完成"
 echo ""

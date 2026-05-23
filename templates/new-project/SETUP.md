@@ -45,16 +45,48 @@ bash init.sh
 
 ---
 
-## Step 4 — 清理并首次 commit
+## Step 4 — 个人本地覆盖（可选）
+
+如需在本机添加个人专属的 Claude 指令（不想提交到 git），创建：
+
+```bash
+touch CLAUDE.local.md
+```
+
+此文件已在 `.gitignore` 中排除，Claude Code 会在项目 `CLAUDE.md` 之后自动加载它。
+适合写：个人快捷命令、临时调试偏好、机器特定路径等。
+
+---
+
+## Step 5 — 清理并首次 commit
 
 ```bash
 rm project.env init.sh SETUP.md
 git init
+bash .githooks/install.sh   # git init 之后才能写入 .git/config
 git add .
 git commit -m "chore: init project from template"
 ```
 
+> `install.sh` 必须在 `git init` 之后运行，否则 `.git/config` 尚不存在，hook 配置无处写入。
+> 安装后直接向主线 commit 会被 `pre-commit` hook 自动拦截。
+
 重启 Claude Code，验证 SessionStart 摘要显示正确的分支和 PROGRESS 行数。
+
+---
+
+## 附录：日常 Context 管理速查
+
+| 命令 | 场景 |
+|---|---|
+| `/clear` | 任务切换时完全重置 context |
+| `/compact Focus on <重点>` | 长会话压缩，指定保留内容 |
+| `/btw <问题>` | 快速查询，不污染对话历史 |
+| `/rename <名称>` | 命名当前 session（多任务时易区分）|
+| `claude --continue` | 续接最近一次 session |
+| `claude --resume` | 从列表选择历史 session 续接 |
+| `Esc` | 中断当前操作但保留 context |
+| `Esc+Esc` | 回滚到上一个检查点 |
 
 ---
 
