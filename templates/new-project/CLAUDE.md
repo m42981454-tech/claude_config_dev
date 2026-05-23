@@ -42,6 +42,8 @@ Progress rules live in `.claude/rules/progress-conventions.md`.
 
 ## 4. Agents
 
+L3 project agents are available but disabled by default. Source files live in `.claude/agents/_available/`; copy one into `.claude/agents/` or enable it through `.claude/agents/.enabled` before dispatching it. See `.claude/agents/README.md`.
+
 Dispatch and double-signoff rules live in `.claude/rules/team-orchestration.md`.
 
 | Layer | Agent | Use When |
