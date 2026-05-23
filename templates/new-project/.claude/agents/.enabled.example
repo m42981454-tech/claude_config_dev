@@ -1,100 +1,81 @@
-# Project Agent Loadout — one kebab-case agent ID per line, # for comments
+# Project Agent Loadout
 #
-# 用法:
-#   1. 把本文件重命名为 .enabled
-#   2. 添加本项目需要的 agent ID（必须匹配 <agent-dev-pool>/<agent-id>.md 和 frontmatter `name:`）
-#   3. 下次 Claude Code 启动时，SessionStart hook 自动从共享池复制缺失 agent 到本目录
-#   4. 如果本目录已经有同名 agent 文件，项目本地版本优先，不会被共享池覆盖
+# 用法：
+# 1. 复制本文件为 `.enabled`。
+# 2. 只取消注释当前项目真正需要的 agent。
+# 3. 每行一个 kebab-case agent ID。
+# 4. SessionStart 的 agent-loader 会从共享 dev pool 复制缺失的 agent 到本项目。
 #
-# 可用 agent 清单（44 个）查询:
-#   ls <agent-dev-pool>/
-#
-# 已经在 L2 用户级全局加载的（无需在此添加）:
-#   project-manager-senior, code-reviewer, minimal-change-engineer, git-workflow-master
-#
-# L3 模板默认 agent（已在本目录文件存在，无需在此添加）:
-#   agents-orchestrator, backend-architect, frontend-developer,
-#   reality-checker, project-management-jira-workflow-steward
+# 注意：
+# - 不要把所有 agent 全部启用；这会扩大工具面和上下文面。
+# - L2 用户级通用 agent 通常不需要写入 `.enabled`。
+# - 项目已有同名 `.claude/agents/<name>.md` 时，以项目本地版本为准。
 
-# === L2 用户级默认角色覆盖范围: 已自动可用，无需取消注释 ===
-# 说明：以下“推定来源 / 覆盖参考”来自 reference 目录角色职责对照，不是 agent 文件中的显式血缘字段。
-#
-# project-manager-senior       # 推定来源 / 覆盖参考：project-manager-senior、product-manager、project-shepherd、studio-producer
-#                              # 覆盖内容：需求拆解、范围控制、任务列表、验收标准和多角色协调
-# code-reviewer                # 推定来源 / 覆盖参考：engineering-code-reviewer、security-engineer、senior-developer
-#                              # 覆盖内容：代码审查、PR 审计、正确性、安全性、可维护性和性能反馈
-# minimal-change-engineer      # 推定来源 / 覆盖参考：engineering-minimal-change-engineer、senior-developer、git-workflow-master
-#                              # 覆盖内容：最小改动修复、热修、配置调整和避免顺手扩大范围
-# git-workflow-master          # 推定来源 / 覆盖参考：engineering-git-workflow-master、project-management-jira-workflow-steward
-#                              # 覆盖内容：分支策略、提交信息、合并冲突、worktree 和 Git 操作建议
-#
-# === L3 模板默认角色覆盖范围: 新项目默认可用，无需取消注释 ===
-#
-# agents-orchestrator          # 推定来源 / 覆盖参考：agents-orchestrator、workflow-architect、workflow-optimizer、automation-governance-architect
-#                              # 覆盖内容：多 agent 流水线、复杂多阶段项目、开发到验收的流程编排
-# backend-architect            # 推定来源 / 覆盖参考：engineering-backend-architect、software-architect、backend-architect-with-memory
-#                              # 覆盖内容：后端架构、接口设计、数据库结构、认证、微服务和云基础设施
-# frontend-developer           # 推定来源 / 覆盖参考：engineering-frontend-developer、design-ux-architect、xr-interface-architect
-#                              # 覆盖内容：前端页面、组件、浏览器逻辑、样式、动效、性能和基础无障碍
-# reality-checker              # 推定来源 / 覆盖参考：testing-reality-checker、testing-evidence-collector、testing-test-results-analyzer
-#                              # 覆盖内容：完成度复核、生产就绪检查、证据验证和防止虚假通过
-# project-management-jira-workflow-steward # 推定来源 / 覆盖参考：project-management-jira-workflow-steward
-#                              # 覆盖内容：Jira-linked git workflow、issue-first、分支和进度联动
-#
-# === 共享池完整索引: 按项目需要取消注释 ===
-#
-# 测试、质量与验收
-# accessibility-auditor        # 无障碍审计、键盘导航、屏幕阅读器和 WCAG 验收
-# api-tester                   # 接口契约、端点健康检查、集成回归和接口质量验证
-# evidence-collector           # 浏览器证据、截图、日志、复现步骤和验收证明
-# model-qa-specialist          # 模型输出质量、评测样本、误差模式和回归验收
-# performance-benchmarker      # 性能基准、延迟吞吐、负载测试和瓶颈定位
-# test-results-analyzer        # 测试报告分析、失败模式、波动用例和质量趋势
-#
-# 安全、合规与信任
-# agentic-identity-trust-architect # 代理身份、信任边界、权限模型和审计链路
-# blockchain-security-auditor  # 区块链安全、合约风险和链上资产保护
-# compliance-auditor           # 合规审计、控制项检查、证据整理和风险报告
-# security-engineer            # 应用安全、威胁建模、密钥权限和安全代码审查
-# threat-detection-engineer    # 威胁检测、告警规则、攻击链分析和安全监控
-# zk-steward                   # 零知识证明、隐私协议和密码学流程治理
-#
-# 架构、开发与交付
-# automation-governance-architect # 自动化治理、流程边界、审批策略和风险控制
-# autonomous-optimization-architect # 自主优化系统、反馈回路和安全约束设计
-# codebase-onboarding-engineer # 陌生仓库梳理、模块地图、依赖关系和风险提示
-# devops-automator             # 容器、持续集成、持续交付、部署和监控自动化
-# incident-response-commander  # 生产事故指挥、复盘、值班流程和应急协作
-# rapid-prototyper             # 快速原型、概念验证、最小可行产品和方案试探
-# senior-developer             # 复杂全栈实现、疑难问题拆解和工程落地支援
-# software-architect           # 系统架构、边界划分、技术选型和长期演进设计
-# sre-site-reliability-engineer # 服务可靠性、SLO、错误预算、可观测性和降噪
-# workflow-architect           # 工作流架构、跨系统编排、状态流转和流程建模
-# workflow-optimizer           # 工作流优化、瓶颈消除、自动化改造和效率提升
-#
-# 数据、AI 与智能系统
-# ai-data-remediation-engineer # AI 数据修复、数据质量问题定位和训练数据治理
+# === L2 用户级通用角色：通常默认可用，不建议在项目 .enabled 中重复启用 ===
+# project-manager-senior       # 项目拆解、范围控制、验收标准、路线图
+# code-reviewer                # 代码审查、风险发现、安全和可维护性检查
+# minimal-change-engineer      # 小范围修复、低风险重构、最小改动策略
+# git-workflow-master          # 分支、提交、合并、cherry-pick、Git 卫生
+
+# === L3 项目模板默认角色：已随 new-project 模板放入 .claude/agents/ ===
+# agents-orchestrator          # 多 agent 调度、任务路由、复杂流程协调
+# backend-architect            # 后端架构、API 边界、数据模型和服务拆分
+# frontend-developer           # 前端实现、组件结构、交互细节和视觉打磨
+# reality-checker              # 完成度核查、证据检查、差距识别
+# project-management-jira-workflow-steward # Jira/Issue 优先流程、进度和分支卫生
+
+# === 测试、证据、质量 ===
+# accessibility-auditor        # 无障碍审查、键盘导航、读屏器、WCAG 检查
+# api-tester                   # API 契约、端点健康、集成回归、接口质量验证
+# evidence-collector           # 截图、日志、命令输出、验证证据收集
+# model-qa-specialist          # 模型输出质量、样本评估、误差模式分析
+# performance-benchmarker      # 性能基准、延迟、负载、瓶颈定位
+# test-results-analyzer        # 测试结果归因、失败模式分析、波动判断
+
+# === 安全、合规、信任 ===
+# agentic-identity-trust-architect # agent 身份、信任边界、权限模型
+# blockchain-security-auditor  # 区块链安全、合约风险、资产保护
+# compliance-auditor           # 合规审查、控制项检查、证据整理
+# security-engineer            # 应用安全、威胁建模、漏洞和安全代码审查
+# threat-detection-engineer    # 威胁检测、告警规则、攻击行为分析
+# zk-steward                   # 零知识证明、隐私计算、密码学流程治理
+
+# === 架构、平台、运维 ===
+# automation-governance-architect # 自动化治理、审批策略、风险边界
+# autonomous-optimization-architect # 自主优化系统、反馈回路、安全约束
+# codebase-onboarding-engineer # 新人/agent 代码库导览、依赖地图、入门路径
+# devops-automator             # CI/CD、部署、容器、自动化运维
+# incident-response-commander  # 生产事故响应、分级、恢复和复盘
+# rapid-prototyper             # 快速原型、概念验证、最小可行方案
+# senior-developer             # 复杂实现、疑难问题、工程落地支持
+# software-architect           # 系统架构、边界划分、长期演进设计
+# sre-site-reliability-engineer # 可靠性、SLO、监控、容量和故障恢复
+# workflow-architect           # 跨系统工作流建模、状态流转和流程设计
+# workflow-optimizer           # 工作流优化、瓶颈消除、自动化改进
+
+# === 数据、AI、智能系统 ===
+# ai-data-remediation-engineer # AI 数据修复、数据质量、训练数据治理
 # ai-engineer                  # AI 功能、模型集成、推理链路和生产化落地
-# data-consolidation-agent     # 数据整合、来源归并、字段对齐和重复数据治理
-# data-engineer                # 数据管道、ETL、ELT、dbt、湖仓和数据平台
-# database-optimizer           # 数据库结构、查询计划、索引、迁移影响和性能优化
-# identity-graph-operator      # 身份图谱、实体关联、关系建模和画像数据运营
-#
-# 平台、工具与集成
-# developer-advocate           # 开发者体验、示例、文档反馈和社区沟通
-# document-generator           # 文档生成、模板化说明、交付材料和结构化输出
-# email-intelligence-engineer  # 邮件智能处理、分类、摘要、线索提取和自动化
-# feishu-integration-developer # 飞书集成、机器人、审批、消息和协作自动化
-# lsp-index-engineer           # 语言服务器编排、语义索引和代码智能基础设施
-# mcp-builder                  # MCP 服务、工具、资源、提示词和代理能力扩展
-# technical-writer             # 技术文档、发布说明、运行手册和交接材料
-# tool-evaluator               # 工具评估、选型对比、能力验证和采用建议
-#
-# 产品形态与专项技术
-# cms-developer                # 内容管理系统、站点结构、发布流程和后台能力
-# embedded-firmware-engineer   # 嵌入式固件、硬件接口、实时约束和设备调试
-# filament-optimization-specialist # 3D 打印耗材、切片参数、材料表现和质量优化
-# mobile-app-builder           # 移动应用、iOS、Android 和跨平台实现
-# solidity-smart-contract-engineer # Solidity 合约、链上业务逻辑和智能合约实现
-# voice-ai-integration-engineer # 语音 AI、通话流程、语音识别和实时交互集成
-# wechat-mini-program-developer # 微信小程序、平台接口、页面流程和发布适配
+# data-consolidation-agent     # 数据整合、来源归并、字段对齐
+# data-engineer                # ETL/ELT、数据平台、管道和数据建模
+# database-optimizer           # 数据库性能、查询计划、索引和迁移影响
+# identity-graph-operator      # 身份图谱、实体关联、跨系统身份数据
+
+# === 平台、工具、集成 ===
+# developer-advocate           # 开发者体验、示例、文档可用性和社区反馈
+# document-generator           # 文档生成、模板化说明、交付材料整理
+# email-intelligence-engineer  # 邮件智能处理、分类、摘要、自动化
+# feishu-integration-developer # 飞书集成、机器人、审批和消息自动化
+# lsp-index-engineer           # 语言服务索引、代码搜索、语义导航基础设施
+# mcp-builder                  # MCP 服务、工具、资源和代理集成
+# technical-writer             # 技术文档、发布说明、用户/开发者材料
+# tool-evaluator               # 工具评估、选型比较、能力验证
+
+# === 产品形态和专项技术 ===
+# cms-developer                # CMS、内容模型、发布流程和编辑体验
+# embedded-firmware-engineer   # 嵌入式固件、硬件接口、设备约束
+# filament-optimization-specialist # 3D 打印材料、参数和质量优化
+# mobile-app-builder           # iOS/Android/跨平台移动应用实现
+# solidity-smart-contract-engineer # Solidity 合约、链上逻辑和安全实现
+# voice-ai-integration-engineer # 语音 AI、对话流、语音识别和交互集成
+# wechat-mini-program-developer # 微信小程序、平台 API、页面流程和发布

@@ -30,6 +30,7 @@ Thumbs.db
 
 # temp
 *.tmp
+*.stackdump
 
 # secrets
 .env
