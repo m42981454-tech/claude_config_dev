@@ -45,17 +45,7 @@ bash init.sh
 
 ---
 
-## Step 4 — 启用 git hooks（可选但推荐）
-
-```bash
-bash .githooks/install.sh
-```
-
-安装后，直接向主线（`[MAIN_BRANCH]` / `main`）commit 会被 `pre-commit` hook 自动拦截。
-
----
-
-## Step 5 — 个人本地覆盖（可选）
+## Step 4 — 个人本地覆盖（可选）
 
 如需在本机添加个人专属的 Claude 指令（不想提交到 git），创建：
 
@@ -68,14 +58,18 @@ touch CLAUDE.local.md
 
 ---
 
-## Step 6 — 清理并首次 commit
+## Step 5 — 清理并首次 commit
 
 ```bash
 rm project.env init.sh SETUP.md
 git init
+bash .githooks/install.sh   # git init 之后才能写入 .git/config
 git add .
 git commit -m "chore: init project from template"
 ```
+
+> `install.sh` 必须在 `git init` 之后运行，否则 `.git/config` 尚不存在，hook 配置无处写入。
+> 安装后直接向主线 commit 会被 `pre-commit` hook 自动拦截。
 
 重启 Claude Code，验证 SessionStart 摘要显示正确的分支和 PROGRESS 行数。
 
