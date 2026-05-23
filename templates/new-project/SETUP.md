@@ -81,5 +81,20 @@ git commit -m "chore: init project from template"
 
 ---
 
+## 附录：日常 Context 管理速查
+
+| 命令 | 场景 |
+|---|---|
+| `/clear` | 任务切换时完全重置 context |
+| `/compact Focus on <重点>` | 长会话压缩，指定保留内容 |
+| `/btw <问题>` | 快速查询，不污染对话历史 |
+| `/rename <名称>` | 命名当前 session（多任务时易区分）|
+| `claude --continue` | 续接最近一次 session |
+| `claude --resume` | 从列表选择历史 session 续接 |
+| `Esc` | 中断当前操作但保留 context |
+| `Esc+Esc` | 回滚到上一个检查点 |
+
+---
+
 > **stack-*.md 占位符说明**：若某个变量值暂时不确定，可先在 `project.env` 里写一个占位值，
 > 脚本跑完后再手动修改对应文件中的那一行。
