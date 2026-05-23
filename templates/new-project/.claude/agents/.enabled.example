@@ -17,7 +17,8 @@
 # minimal-change-engineer      # 小范围修复、低风险重构、最小改动策略
 # git-workflow-master          # 分支、提交、合并、cherry-pick、Git 卫生
 
-# === L3 项目模板默认角色：已随 new-project 模板放入 .claude/agents/ ===
+# === L3 项目模板预装角色：源文件位于 .claude/agents/_available/ ===
+# === 启用方式：取消注释后，agent-loader 会优先从 _available/ 复制到 .claude/agents/ ===
 # agents-orchestrator          # 多 agent 调度、任务路由、复杂流程协调
 # backend-architect            # 后端架构、API 边界、数据模型和服务拆分
 # frontend-developer           # 前端实现、组件结构、交互细节和视觉打磨
