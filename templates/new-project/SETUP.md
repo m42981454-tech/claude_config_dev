@@ -45,7 +45,17 @@ bash init.sh
 
 ---
 
-## Step 4 — 清理并首次 commit
+## Step 4 — 启用 git hooks（可选但推荐）
+
+```bash
+bash .githooks/install.sh
+```
+
+安装后，直接向主线（`[MAIN_BRANCH]` / `main`）commit 会被 `pre-commit` hook 自动拦截。
+
+---
+
+## Step 5 — 清理并首次 commit
 
 ```bash
 rm project.env init.sh SETUP.md
