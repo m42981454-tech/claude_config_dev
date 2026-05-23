@@ -8,7 +8,8 @@ START_TS=$(date -u +"%Y-%m-%dT%H:%M:%SZ" 2>/dev/null || date)
 INPUT=$(cat 2>/dev/null || true)
 
 ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
-MEM_DIR="$ROOT/.claude/session-memory"
+CLAUDE_DIR="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
+MEM_DIR="$CLAUDE_DIR/session-memory"
 LATEST="$MEM_DIR/latest.md"
 DAY_FILE="$MEM_DIR/$(date -u +"%Y-%m-%d" 2>/dev/null || date +%Y-%m-%d)-session.md"
 
