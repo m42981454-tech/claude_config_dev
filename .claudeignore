@@ -1,16 +1,2 @@
 # 排除模板目录，防止 templates/new-project/CLAUDE.md 被自动加载到上下文
 templates/
-
-# 排除 plugin 缓存和运行时目录
-plugins/cache/
-plugins/marketplaces/
-
-# 排除运行时状态目录
-backups/
-cache/
-debug/
-sessions/
-shell-snapshots/
-statsig/
-telemetry/
-downloads/
