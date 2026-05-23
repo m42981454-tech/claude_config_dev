@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-# 新项目初始化脚本 — 读取 project.env，替换所有占位符
-# 用法：bash init.sh
+# Initialize a new project from this template by replacing placeholders.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -8,71 +7,113 @@ cd "$SCRIPT_DIR"
 
 ENV_FILE="project.env"
 if [[ ! -f "$ENV_FILE" ]]; then
-  echo "❌ 找不到 $ENV_FILE，请先填写配置文件" >&2
+  echo "Missing $ENV_FILE. Fill the template config first." >&2
   exit 1
 fi
 
-# 读取变量（跳过注释行和空行）
-while IFS='=' read -r key value; do
-  [[ "$key" =~ ^[[:space:]]*# ]] && continue
-  [[ -z "$key" ]] && continue
-  key="${key%%#*}"          # 去掉行内注释
-  key="${key%"${key##*[![:space:]]}"}"  # trim trailing space
-  value="${value%%#*}"
+trim() {
+  local value="$1"
+  value="${value#"${value%%[![:space:]]*}"}"
   value="${value%"${value##*[![:space:]]}"}"
+  printf '%s' "$value"
+}
+
+while IFS='=' read -r key value || [[ -n "${key:-}" ]]; do
+  [[ "${key:-}" =~ ^[[:space:]]*# ]] && continue
+  key="$(trim "${key:-}")"
+  [[ -z "$key" ]] && continue
+  value="${value%%#*}"
+  value="$(trim "$value")"
   export "$key=$value"
 done < "$ENV_FILE"
 
 DATE="${DATE:-$(date +%Y-%m-%d)}"
+REPO_SLUG="${REPO_OWNER:-owner}/${REPO_NAME:-repo}"
 
-echo "▶ 开始初始化 PROJECT_NAME=$PROJECT_NAME MAIN_BRANCH=$MAIN_BRANCH"
+required_vars=(
+  PROJECT_NAME PHASE MAIN_BRANCH BACKEND_DIR FRONTEND_DIR
+  BACKEND_STACK FRONTEND_STACK INFRA
+  BACKEND_LANGUAGE_VERSION BACKEND_FRAMEWORK ORM_AND_MIGRATIONS DATABASE
+  TASK_QUEUE TEST_FRAMEWORK_BACKEND
+  FRONTEND_FRAMEWORK FRONTEND_LANGUAGE STYLING STATE_MGMT I18N
+  TEST_FRAMEWORK_FRONTEND REPO_OWNER REPO_NAME
+)
 
-# ---- 替换函数（用 | 作 delimiter，避免值中含 /）----
+missing=()
+for var in "${required_vars[@]}"; do
+  if [[ -z "${!var:-}" ]]; then
+    missing+=("$var")
+  fi
+done
+
+if [[ ${#missing[@]} -gt 0 ]]; then
+  echo "Missing required values in $ENV_FILE:" >&2
+  printf '  %s\n' "${missing[@]}" >&2
+  exit 1
+fi
+
+echo "Initializing $PROJECT_NAME on main branch $MAIN_BRANCH"
+
 sub() {
   local file="$1"
   [[ -f "$file" ]] || return 0
-  sed -i \
-    -e "s|\\[PROJECT_NAME\\]|$PROJECT_NAME|g" \
-    -e "s|\\[PHASE\\]|$PHASE|g" \
-    -e "s|\\[DATE\\]|$DATE|g" \
-    -e "s|\\[MAIN_BRANCH\\]|$MAIN_BRANCH|g" \
-    -e "s|\\[backend-dir\\]|$BACKEND_DIR|g" \
-    -e "s|\\[frontend-dir\\]|$FRONTEND_DIR|g" \
-    -e "s|\\[BACKEND_STACK\\]|$BACKEND_STACK|g" \
-    -e "s|\\[FRONTEND_STACK\\]|$FRONTEND_STACK|g" \
-    -e "s|\\[INFRA\\]|$INFRA|g" \
-    -e "s|\\[BACKEND_LANGUAGE_VERSION\\]|$BACKEND_LANGUAGE_VERSION|g" \
-    -e "s|\\[BACKEND_FRAMEWORK\\]|$BACKEND_FRAMEWORK|g" \
-    -e "s|\\[ORM_AND_MIGRATIONS\\]|$ORM_AND_MIGRATIONS|g" \
-    -e "s|\\[DATABASE\\]|$DATABASE|g" \
-    -e "s|\\[TEST_FRAMEWORK\\]|$TEST_FRAMEWORK_BACKEND|g" \
-    -e "s|\\[FRONTEND_FRAMEWORK\\]|$FRONTEND_FRAMEWORK|g" \
-    -e "s|\\[LANGUAGE\\]|$FRONTEND_LANGUAGE|g" \
-    -e "s|\\[STYLING\\]|$STYLING|g" \
-    -e "s|\\[STATE_MGMT\\]|$STATE_MGMT|g" \
-    -e "s|\\[TEST_FRAMEWORK_FRONTEND\\]|$TEST_FRAMEWORK_FRONTEND|g" \
-    "$file"
+  replace "$file" "PROJECT_NAME" "$PROJECT_NAME"
+  replace "$file" "PHASE" "$PHASE"
+  replace "$file" "DATE" "$DATE"
+  replace "$file" "MAIN_BRANCH" "$MAIN_BRANCH"
+  replace "$file" "REPO_OWNER" "$REPO_OWNER"
+  replace "$file" "REPO_NAME" "$REPO_NAME"
+  replace "$file" "REPO" "$REPO_SLUG"
+  replace "$file" "backend-dir" "$BACKEND_DIR"
+  replace "$file" "frontend-dir" "$FRONTEND_DIR"
+  replace "$file" "BACKEND_STACK" "$BACKEND_STACK"
+  replace "$file" "FRONTEND_STACK" "$FRONTEND_STACK"
+  replace "$file" "INFRA" "$INFRA"
+  replace "$file" "BACKEND_LANGUAGE_VERSION" "$BACKEND_LANGUAGE_VERSION"
+  replace "$file" "BACKEND_FRAMEWORK" "$BACKEND_FRAMEWORK"
+  replace "$file" "ORM_AND_MIGRATIONS" "$ORM_AND_MIGRATIONS"
+  replace "$file" "DATABASE" "$DATABASE"
+  replace "$file" "TASK_QUEUE" "$TASK_QUEUE"
+  replace "$file" "TEST_FRAMEWORK" "$TEST_FRAMEWORK_BACKEND"
+  replace "$file" "FRONTEND_FRAMEWORK" "$FRONTEND_FRAMEWORK"
+  replace "$file" "LANGUAGE" "$FRONTEND_LANGUAGE"
+  replace "$file" "STYLING" "$STYLING"
+  replace "$file" "STATE_MGMT" "$STATE_MGMT"
+  replace "$file" "I18N" "$I18N"
+  replace "$file" "TEST_FRAMEWORK_FRONTEND" "$TEST_FRAMEWORK_FRONTEND"
 }
 
-# ---- 需要替换的文件 ----
-sub CLAUDE.md
-sub .claude/rules/git-workflow.md
-sub .claude/rules/behavioral-rules.md
-sub .claude/rules/project-context.md
-sub .claude/rules/stack-backend.md
-sub .claude/rules/stack-frontend.md
-sub .claude/rules/README.md
-sub .githooks/pre-commit
-sub progress.md
+replace() {
+  local file="$1"
+  local placeholder="$2"
+  local value="$3"
+  local escaped
+  escaped=$(printf '%s' "$value" | sed -e 's/[\\&|]/\\&/g')
+  sed -i -e "s|\\[$placeholder\\]|$escaped|g" "$file"
+}
 
-echo "✅ 占位符替换完成"
-echo ""
-echo "📋 后续手动步骤："
-echo "  1. 检查 .claude/rules/stack-backend.md — 删除不适用的技术行（如无 Redis/Celery）"
-echo "  2. 检查 .claude/rules/stack-frontend.md — 删除不适用的技术行（如无 i18n）"
-echo "  3. 编辑 .claude/agents/.enabled — 按需启用额外 agent"
-echo "  4. 若无后端：删除 .claude/rules/stack-backend.md"
-echo "  5. 若无前端：删除 .claude/rules/stack-frontend.md"
-echo "  6. 删除 project.env / init.sh / SETUP.md，做第一次 commit"
-echo ""
-echo "🚀 完成后重启 Claude Code，验证 SessionStart 摘要输出正常"
+targets=(
+  CLAUDE.md
+  progress.md
+  .claude/rules/git-workflow.md
+  .claude/rules/behavioral-rules.md
+  .claude/rules/project-context.md
+  .claude/rules/stack-backend.md
+  .claude/rules/stack-frontend.md
+  .claude/rules/README.md
+  .githooks/pre-commit
+)
+
+for file in "${targets[@]}"; do
+  sub "$file"
+done
+
+echo "Placeholder replacement complete."
+echo
+echo "Next steps:"
+echo "1. Review .claude/rules/stack-backend.md and stack-frontend.md; delete unused rows."
+echo "2. Review .claude/agents/.enabled for optional agents."
+echo "3. If the project has no backend, delete .claude/rules/stack-backend.md."
+echo "4. If the project has no frontend, delete .claude/rules/stack-frontend.md."
+echo "5. Delete project.env, init.sh, and SETUP.md before the first project commit."
+echo "6. Run .claude/scripts/validate.sh --force, or .claude/scripts/validate.ps1 -Force on Windows."
