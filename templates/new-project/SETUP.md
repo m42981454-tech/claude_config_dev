@@ -55,7 +55,20 @@ bash .githooks/install.sh
 
 ---
 
-## Step 5 — 清理并首次 commit
+## Step 5 — 个人本地覆盖（可选）
+
+如需在本机添加个人专属的 Claude 指令（不想提交到 git），创建：
+
+```bash
+touch CLAUDE.local.md
+```
+
+此文件已在 `.gitignore` 中排除，Claude Code 会在项目 `CLAUDE.md` 之后自动加载它。
+适合写：个人快捷命令、临时调试偏好、机器特定路径等。
+
+---
+
+## Step 6 — 清理并首次 commit
 
 ```bash
 rm project.env init.sh SETUP.md
