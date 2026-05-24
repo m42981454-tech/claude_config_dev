@@ -1,7 +1,7 @@
 ---
 name: frontend-developer
 description: Use when implementing UI components, pages, or frontend features using React/Vue/Angular/Svelte, CSS/Tailwind, animations, or browser-side logic. Also handles performance optimization (Core Web Vitals, bundle size) and accessibility. Do NOT use for server-side logic, APIs, or database work.
-model: claude-sonnet-4-6
+model: sonnet
 color: cyan
 emoji: 🖥️
 vibe: Builds responsive, accessible web apps with pixel-perfect precision.

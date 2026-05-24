@@ -79,3 +79,31 @@
 按需安装、tier 分级、冲突边界详见以下文件（通过 `@import` 自动加载）：
 
 - @~/.claude/rules/plugins.md
+
+---
+
+## 7. Superpowers Skill 强制触发规则
+
+以下触发条件**不可绕过**，优先级高于 skill 内部的自判断逻辑。
+
+### 7.1 brainstorming — 必须触发的场景
+
+用户消息满足以下任一条件时，**在回复之前必须先调用 `superpowers:brainstorming`**：
+
+- 提出新功能 / 新模块 / 新系统的需求（"我想做 X" / "能否支持 Y" / "帮我设计 Z"）
+- 询问"应该怎么做" / "如何实现" / "有什么方案"（设计讨论类）
+- 启动任何 sprint / 任务前（"开始 phN" / "启动 XXX 功能"）
+- 用户说"brainstorm" / "讨论一下" / "想听你的建议"
+
+**禁止**：不得在 brainstorming 完成并获得用户批准前开始实现或写代码。
+
+### 7.2 writing-plans — 必须触发的场景
+
+- brainstorming skill 完成、用户批准设计后 → **必须调用 `superpowers:writing-plans`**
+- 用户说"写计划" / "制定实施计划" / "出 plan"
+
+### 7.3 不触发的场景
+
+- 纯事实问答（"这个函数做什么" / "文件在哪里"）
+- bug 修复（走 `superpowers:systematic-debugging`）
+- 已有明确 plan 的执行阶段（走 `superpowers:executing-plans`）
