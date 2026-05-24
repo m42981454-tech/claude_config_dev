@@ -1,0 +1,23 @@
+# User Working Style Example
+
+> Copy this file to `user-working-style.md` only after the user explicitly approves stable working-style rules.
+> Do not promote one-off decisions into long-term rules.
+
+---
+
+## Communication
+
+- Human-facing explanations should be written in the user's preferred language.
+- AI-facing confirmation prompts, machine labels, and command names may remain in English when that improves precision.
+
+## Review And Verification
+
+- Before claiming completion, provide verification evidence.
+- For risky config, hook, template, or workflow changes, prefer review before merge.
+- Treat session-review habit findings as inference until the user confirms them.
+
+## Change Control
+
+- Do not modify `CLAUDE.md`, `.claude/rules/`, agent prompts, plugin config, or long-term preferences based only on automatic session learning.
+- Promote preferences only after explicit user approval.
+

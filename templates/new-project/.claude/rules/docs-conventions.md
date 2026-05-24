@@ -48,6 +48,7 @@ paths:
 | `docs/archive/` | 历史 design / decision / proposal / sprint 报告 | doc 超 30 day 不被引用 → PM 在下次 chore 移入 |
 | `docs/brainstorm/` | 启发式 brainstorming notes | brainstorm 阶段产出 |
 | `docs/postmortems/` | 事故复盘（模板见 `postmortems/README.md`）| 每次重大事故必建独立 .md |
+| **`docs/report/`**（工具产物报告）| skill / 命令 / subagent 生成的结构化报告 | 详 §1.5 |
 | `docs/YYYYMMDD/` 或 `YYYYMMDD-confirm/` `YYYYMMDD-future/` | sprint 专辑（numbered set）| sprint 进行中（整个 numbered 集）|
 
 **铁律**:
@@ -62,6 +63,29 @@ paths:
 - ❌ 大写 `PROPOSAL_<X>.md` 等遗留风格（只在 archive 保留；新建用 `YYYY-MM-DD_proposal_<x>.md`）
 - ❌ 数字开头但无目录（`00-summary.md` 顶层）: 务必放进 sprint 专辑目录
 - ❌ 重复日期 + 重复 topic（同 topic 改了多次？用 `YYYY-MM-DD_<topic>-v2.md` 显式编号，**不覆盖**原 doc）
+
+### 1.5 skill / 命令产物报告（`docs/report/`）
+
+**凡由 skill、Claude Code 命令（`/project:*`）或 subagent 生成的结构化报告，必须落在 `docs/report/`。**
+
+| 类型 | 命名格式 | 示例 |
+|---|---|---|
+| 模板 / 项目优化报告 | `YYYY-MM-DD-<topic>-report.md` | `2026-05-24-template-optimization-report.md` |
+| 任务状态报告 | `YYYY-MM-DD-<topic>-task-status-report.md` | `2026-05-24-superpowers-specs-task-status-report.md` |
+| `/project:session-review` 写文件时 | `YYYY-MM-DD-session-review.md` | `2026-05-24-session-review.md` |
+| code review / security review 报告 | `YYYY-MM-DD-<topic>-review-report.md` | — |
+
+**规则**：
+
+- 命名用**全连字符**（`-`），不混用下划线（区别于 `docs/YYYY-MM/` 用下划线的人工 doc）
+- 必含 `YYYY-MM-DD` 日期前缀
+- **不放 `docs/YYYY-MM/`**（那是人工新建单 doc 的路径，工具产物单独隔离）
+- **不放 `docs/` 顶层**（避免污染顶层）
+- `docs/report/` 内的文件**不触发 archive 30 天规则**（报告是历史证据，按需保留）
+
+**❌ 禁止**：
+
+- 把 skill 生成的报告随意落在 `docs/` 顶层、`docs/YYYY-MM/` 或项目根目录
 
 ---
 
@@ -154,6 +178,7 @@ paths:
 - ❌ **不在 sprint 专辑外横挂顶层 numbered file**（`00-foo.md` 在顶层 = 错误位置）
 - ❌ **不删 / 不 rewrite 历史 postmortems**（只增不改；补充用新 postmortem）
 - ❌ **不在 archive/ 下做活跃工作**（只读 + 移入）
+- ❌ **skill / 命令产物报告不得落在 `docs/` 顶层或 `docs/YYYY-MM/`**（必须进 `docs/report/`，详 §1.5）
 
 ---
 

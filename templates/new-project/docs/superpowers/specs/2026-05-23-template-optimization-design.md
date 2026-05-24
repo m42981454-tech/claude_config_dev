@@ -2,7 +2,7 @@
 
 > **Refs**: 本次会话 review (无 issue, n/a)
 > **Date**: 2026-05-23
-> **Status**: Draft（待用户 review）
+> **Status**: Implemented（2026-05-24 更新；部分后续项按用户决策暂停）
 > **Cross-ref**: T1（已撤销 docs 误删）/ T2 / T4 / T5 / T6（已完成）/ T7（本 doc §2）
 
 ---
@@ -24,11 +24,11 @@
 | 任务 | 状态 |
 |---|---|
 | T1（误删 docs 历史） | ❌ 已撤销，git checkout 恢复 |
-| T2（修 `stack-*.md` `cd` bug）| ✅ 完成，未 commit |
-| T4（`validate.sh` + `.ps1` + SETUP Step 6）| ✅ 完成，未 commit |
-| T5（hook 跨平台健壮性）| ✅ 完成，未 commit |
-| T6（`init.sh` / `init.md` / `settings.json` 同步）| ✅ 完成，未 commit |
-| T7（保守去重 rules）| 🟡 待本 doc 拍板后执行 |
+| T2（修 `stack-*.md` `cd` bug）| ✅ 完成 |
+| T4（`validate.sh` + `.ps1` + SETUP Step 6）| ✅ 完成 |
+| T5（hook 跨平台健壮性）| ✅ 完成 |
+| T6（`init.sh` / `init.md` / `settings.json` 同步）| ✅ 完成 |
+| T7（保守去重 rules）| ✅ 完成 |
 
 ### 1.2 用户原则
 
@@ -216,13 +216,13 @@ T7 完成后跑 `validate.sh`：
 
 ## 4. 验收清单（执行后)
 
-- [ ] `.claudeignore` 含新增 3 条 pattern
-- [ ] `init.md` Step 5 含 §2.4 那段提示
-- [ ] `behavioral-rules.md` 行数从 ~25 行降到 ~15 行，分 §8.1 / §8.2
-- [ ] `progress-conventions.md` §"每完成一个 sprint" 段降到 ~6 行（保留专属约定 + link）
-- [ ] `validate.sh` 跑全绿（rules 内部 link 全部有效）
-- [ ] 仍无新增/删除既有 rule 文件
-- [ ] git-workflow.md 全文未动（diff 应为 0）
+- [x] `.claudeignore` 含新增 template maintenance reference pattern
+- [x] `init.md` Step 5 含 §2.4 那段提示
+- [x] `behavioral-rules.md` 已压缩为摘要 + source-of-truth link
+- [x] `progress-conventions.md` 已去除与 `git-workflow.md §7.7` 的重复流程
+- [x] `validate.sh` / `validate.ps1` 已存在，并在端到端 dry-run 中验证通过
+- [x] 未删除既有 rule 文件
+- [x] `git-workflow.md` source-of-truth 语义未被压缩
 
 ---
 
@@ -247,7 +247,9 @@ T7 完成后跑 `validate.sh`：
 - `.enabled` 不存在（agent-loader.sh 见到此文件不存在就 `exit 0`）
 - agent-loader.sh 只负责从 user-level pool **额外**拉 agent，不影响预装 8 个
 
-**结论**：当前实际状态 = 8 个 agent **永远 active**（与 plugins.md "按需安装"哲学冲突）。
+**当时结论**：当时实际状态 = 8 个 agent **永远 active**（与 plugins.md "按需安装"哲学冲突）。
+
+**2026-05-24 更新**：该问题已通过 `_available/` 目录落地解决；模板 agent 默认 disabled，只有复制到 `.claude/agents/` 或通过 `.enabled` 才激活。
 
 #### 6.1.2 三种实现机制对照
 
@@ -335,13 +337,29 @@ skill 默认全装是合理的，与 #11 哲学不冲突。
 
 ### 6.3 Phase 3 验收清单
 
-- [ ] `.claude/agents/_available/` 含 8 个 `.md` 文件
-- [ ] `.claude/agents/` 根仅含 `.enabled.example` + 新建 `README.md`
-- [ ] `.enabled.example` 注释文字更新（已搬 `_available/`）
-- [ ] `/project:init` Step 5 含预装目录说明
-- [ ] 4 处死链全部消除（grep 找不到对应 markdown link 语法）
-- [ ] validate.sh 跑：死链段输出 `✅ Rules 内部链接全部有效`（占位符等其他段保持原状）
-- [ ] grep 全模板：无 `.claude/agents/<name>.md` 硬编码引用残留
+- [x] `.claude/agents/_available/` 含 8 个 `.md` 文件
+- [x] `.claude/agents/` 根仅含 `.enabled.example` + 新建 `README.md`
+- [x] `.enabled.example` 注释文字更新（已搬 `_available/`）
+- [x] `/project:init` Step 5 含预装目录说明
+- [x] 4 处死链全部消除（grep 找不到对应 markdown link 语法）
+- [x] validate 脚本可检查 rules 内部链接有效性
+- [x] grep 全模板：无 `.claude/agents/<name>.md` 硬编码引用残留
+
+### 6.4 实施状态（2026-05-24 更新）
+
+本设计的模板优化主线已经完成。`validate.sh` 和 `validate.ps1` 保留为必要的跨平台验证入口：
+
+- `validate.sh` 覆盖 Ubuntu、Git Bash 和 shell 场景。
+- `validate.ps1` 覆盖 Windows PowerShell，并能检查 `bash` 是否错误解析到 WSL launcher。
+- 两者只在显式运行时产生输出，不进入 Claude Code session baseline。
+- 之前端到端 dry-run 暴露的问题（hook 路径、占位符残留、Windows shell 差异）都依赖这类验证脚本闭环。
+
+仍有意暂停的事项：
+
+- 完整 statusLine `light/hud` 模式切换。
+- new-project template statusLine 同步。
+- 插件自动化启用策略。
+- 大范围 agent prompt 瘦身。
 
 ---
 

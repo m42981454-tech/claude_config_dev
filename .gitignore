@@ -9,6 +9,7 @@ plugins/claude-hud/*
 # ignore runtime/cache
 backups/
 cache/
+paste-cache/
 debug/
 file-history/
 sessions/

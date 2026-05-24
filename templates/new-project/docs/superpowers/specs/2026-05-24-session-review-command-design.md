@@ -1,7 +1,7 @@
 # Session Review Command Design
 
 > **Date**: 2026-05-24
-> **Status**: Draft, waiting for user review
+> **Status**: Implemented first pass; pending real Claude Code command trial
 > **Scope**: `new-project` template manual session review command
 
 ---
@@ -260,3 +260,29 @@ Recommended defaults:
 - Print in chat by default.
 - Write files only after explicit approval.
 - Treat user-level preference promotion as a separate manual step.
+
+---
+
+## 13. Implementation Status
+
+Implemented on 2026-05-24:
+
+| File | Status |
+|---|---|
+| `.claude/commands/project/session-review.md` | Added |
+| `.claude/scripts/session-review-context.sh` | Added |
+| `.claude/rules/user-working-style.md.example` | Added |
+
+Implemented behavior:
+
+- The command is manually triggered as `/project:session-review`.
+- The collector reads bounded context only.
+- The collector prefers project-local session memory and only accepts user-level session memory when its recorded `cwd` matches the current project root.
+- The command forbids automatic edits, agent/plugin enablement, rule mutation, and commits.
+- The working-style example is opt-in only and must not be promoted without explicit user approval.
+
+Remaining validation:
+
+- Run `/project:session-review` in a real Claude Code session.
+- Confirm output is compact enough for daily use.
+- Confirm no transcript bodies are read unless the user explicitly provides a path.
