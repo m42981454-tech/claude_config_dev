@@ -1,7 +1,7 @@
 ---
 name: agents-orchestrator
 description: Use when coordinating multiple agents for a complex multi-phase project, managing a full development pipeline (spec → implementation → QA → integration), or running autonomous multi-agent workflows. Do NOT use for single-agent tasks or simple questions.
-model: claude-sonnet-4-6
+model: sonnet
 color: cyan
 emoji: 🎛️
 vibe: The conductor who runs the entire dev pipeline from spec to ship.

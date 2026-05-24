@@ -28,7 +28,7 @@ Remove unused placeholder directories and rules during project initialization.
 | Frontend | `[FRONTEND_STACK]` | `.claude/rules/stack-frontend.md` |
 | Infrastructure | `[INFRA]` | add `stack-infra.md` only when needed |
 
-After setup, replace placeholders from `project.env`, then remove `project.env`, `init.sh`, and `SETUP.md`.
+After setup, replace placeholders from `project.env`, then remove `project.env` and `SETUP.md`.
 
 ## 3. Current Work
 
@@ -41,6 +41,8 @@ progress.md
 Progress rules live in `.claude/rules/progress-conventions.md`.
 
 ## 4. Agents
+
+L3 project agents are available but disabled by default. Source files live in `.claude/agents/_available/`; copy one into `.claude/agents/` or enable it through `.claude/agents/.enabled` before dispatching it. See `.claude/agents/README.md`.
 
 Dispatch and double-signoff rules live in `.claude/rules/team-orchestration.md`.
 
@@ -113,7 +115,7 @@ When compacting, always preserve:
 ## 9. Setup
 
 1. Fill `project.env`.
-2. Run `/project:init` in Claude Code, or run `bash init.sh`.
+2. Run `/project:init` in Claude Code, or run `bash .claude/scripts/init.sh`.
 3. Remove unused stack rules and placeholder sections.
 4. Review `.claude/agents/.enabled`.
 5. Commit the initialized project.

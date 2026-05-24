@@ -9,6 +9,7 @@ plugins/claude-hud/*
 # ignore runtime/cache
 backups/
 cache/
+paste-cache/
 debug/
 file-history/
 sessions/
@@ -60,3 +61,4 @@ plugins/plugin-catalog-cache.json
 # nested git repos (manage separately)
 agency-agents-reference/
 mcp-needs-auth-cache.json
+templates/docs/memo.csv

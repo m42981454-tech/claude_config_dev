@@ -1,3 +1,6 @@
-# Template maintenance reference, not project working context.
+# Template maintenance references, not project working context.
+# These files are useful for template maintainers but should not be injected into
+# a derived project's Claude Code context by default.
 docs/claude-code-best-practices.md
-docs/bak
+docs/superpowers/specs/
+docs/bak/

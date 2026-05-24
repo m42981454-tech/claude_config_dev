@@ -1,21 +1,21 @@
-#!/bin/bash
-# 拒绝直接 commit 到主线（main / [MAIN_BRANCH]）。
-# merge commit、cherry-pick、revert 不受限制。
+#!/usr/bin/env bash
+# Block direct commits to protected main branches.
+set -euo pipefail
 
-PROTECTED="main [MAIN_BRANCH]"
-CURRENT=$(git symbolic-ref --short HEAD 2>/dev/null)
+PROTECTED_BRANCHES=("main" "[MAIN_BRANCH]")
+CURRENT="$(git symbolic-ref --short HEAD 2>/dev/null || true)"
 
-for branch in $PROTECTED; do
-    if [ "$CURRENT" = "$branch" ]; then
-        # merge / cherry-pick / revert commit 跳过
-        GIT_DIR=$(git rev-parse --git-dir)
-        [ -f "$GIT_DIR/MERGE_HEAD" ]        && exit 0
-        [ -f "$GIT_DIR/CHERRY_PICK_HEAD" ]  && exit 0
-        [ -f "$GIT_DIR/REVERT_HEAD" ]       && exit 0
-        echo "❌ 禁止直接 commit 到主线 '$branch'。请开子分支后再提交。"
-        echo "   git checkout -b $branch.<topic>"
-        exit 1
-    fi
+for branch in "${PROTECTED_BRANCHES[@]}"; do
+  if [[ "$CURRENT" == "$branch" ]]; then
+    git_dir="$(git rev-parse --git-dir)"
+    [[ -f "$git_dir/MERGE_HEAD" ]] && exit 0
+    [[ -f "$git_dir/CHERRY_PICK_HEAD" ]] && exit 0
+    [[ -f "$git_dir/REVERT_HEAD" ]] && exit 0
+    echo "Direct commits to protected branch '$branch' are blocked." >&2
+    echo "Create a work branch first, for example:" >&2
+    echo "  git checkout -b $branch.<topic>" >&2
+    exit 1
+  fi
 done
 
 exit 0
