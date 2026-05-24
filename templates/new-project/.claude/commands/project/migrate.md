@@ -16,13 +16,13 @@ description: Migrate template modules into an existing project without overwriti
 ## 用法
 
 ```bash
-bash migrate.sh [TARGET_DIR]
+bash .claude/scripts/migrate.sh [TARGET_DIR]
 ```
 
 `TARGET_DIR` 省略时默认为当前目录。支持预览模式（不实际写入）：
 
 ```bash
-DRY_RUN=1 bash migrate.sh [TARGET_DIR]
+DRY_RUN=1 bash .claude/scripts/migrate.sh [TARGET_DIR]
 ```
 
 ## Steps
@@ -31,7 +31,7 @@ DRY_RUN=1 bash migrate.sh [TARGET_DIR]
 2. 运行迁移脚本：
 
 ```bash
-bash migrate.sh /path/to/existing-project
+bash .claude/scripts/migrate.sh /path/to/existing-project
 ```
 
 3. 脚本将按顺序迁入以下模块（目标已存在则跳过）：

@@ -108,7 +108,7 @@ else
 fi
 
 leftovers=()
-for file in "project.env" "init.sh" "SETUP.md"; do
+for file in "project.env" "SETUP.md"; do
   [[ -f "$file" ]] && leftovers+=("$file")
 done
 

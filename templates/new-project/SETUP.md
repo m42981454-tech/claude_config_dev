@@ -33,7 +33,7 @@ Important fields:
 Preferred shell path:
 
 ```bash
-bash init.sh
+bash .claude/scripts/init.sh
 ```
 
 Claude Code path:
@@ -99,7 +99,7 @@ Template maintainers can validate before cleanup with:
 Delete template-only files unless your team intentionally keeps them:
 
 ```bash
-rm project.env init.sh SETUP.md
+rm project.env SETUP.md
 ```
 
 Then create the first real project commit from a work branch, not directly from the protected main branch.

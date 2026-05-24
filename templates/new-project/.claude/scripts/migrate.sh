@@ -2,16 +2,16 @@
 # migrate.sh — 将 new-project 模板模块迁移到已有项目（不覆盖已有文件）。
 #
 # 用法:
-#   bash /path/to/new-project/migrate.sh [TARGET_DIR]
+#   bash /path/to/new-project/.claude/scripts/migrate.sh [TARGET_DIR]
 #
 # TARGET_DIR 省略时默认为当前目录（即已有项目根目录）。
-# DRY_RUN=1 bash migrate.sh [TARGET_DIR] → 只打印动作，不实际执行。
+# DRY_RUN=1 bash .claude/scripts/migrate.sh [TARGET_DIR] → 只打印动作，不实际执行。
 #
 # 不会修改 CLAUDE.md / progress.md（已有项目的核心文件由用户维护）。
-# 不会运行 init.sh（仅适用于新建项目）。
+# 不会运行 .claude/scripts/init.sh（仅适用于新建项目）。
 set -u
 
-TMPL="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+TMPL="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 TARGET="${1:-$(pwd)}"
 DRY_RUN="${DRY_RUN:-0}"
 
@@ -127,7 +127,7 @@ sub_placeholders() {
 # ─────────────────────────────────────────────────────────────────────────────
 printf '\n'
 printf '╔══════════════════════════════════════════════════════╗\n'
-printf '║     new-project 模板迁移工具 (migrate.sh)            ║\n'
+printf '║   new-project 模板迁移工具 (.claude/scripts/migrate.sh)  ║\n'
 printf '╚══════════════════════════════════════════════════════╝\n'
 printf '\n'
 printf '  Template : %s\n' "$TMPL"

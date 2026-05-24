@@ -7,7 +7,7 @@ description: Initialize a new project from project.env by replacing template pla
 Initialize this project template. Prefer the deterministic shell path when possible:
 
 ```bash
-bash init.sh
+bash .claude/scripts/init.sh
 ```
 
 If shell execution is unavailable, perform the same steps with Read/Edit tools.
@@ -59,7 +59,7 @@ On Windows PowerShell:
 
 - Placeholder replacement is complete.
 - `validate.sh` or `validate.ps1` exits 0 after initialization and cleanup.
-- `project.env`, `init.sh`, and `SETUP.md` are deleted before the first real project commit, unless the team intentionally keeps them as docs.
+- `project.env` and `SETUP.md` are deleted before the first real project commit, unless the team intentionally keeps them as docs.
 - The first commit is made on a work branch, not directly on the protected main branch.
 
 ## Template Maintenance Notes

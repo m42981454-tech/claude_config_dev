@@ -2,8 +2,8 @@
 # Initialize a new project from this template by replacing placeholders.
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "$SCRIPT_DIR"
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+cd "$ROOT"
 
 ENV_FILE="project.env"
 if [[ ! -f "$ENV_FILE" ]]; then
@@ -115,5 +115,5 @@ echo "1. Review .claude/rules/stack-backend.md and stack-frontend.md; delete unu
 echo "2. Review .claude/agents/.enabled for optional agents."
 echo "3. If the project has no backend, delete .claude/rules/stack-backend.md."
 echo "4. If the project has no frontend, delete .claude/rules/stack-frontend.md."
-echo "5. Delete project.env, init.sh, and SETUP.md before the first project commit."
+echo "5. Delete project.env and SETUP.md before the first project commit."
 echo "6. Run .claude/scripts/validate.sh --force, or .claude/scripts/validate.ps1 -Force on Windows."
