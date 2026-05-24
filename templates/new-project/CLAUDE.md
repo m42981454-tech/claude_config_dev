@@ -112,21 +112,7 @@ When compacting, always preserve:
 - Open blockers or unresolved questions
 - Error messages and their resolutions
 
-## 9. Skill 强制触发规则
-
-以下触发条件不可绕过，AI 在回复之前必须先调用对应 skill。
-
-| 场景 | 必须调用 |
-|---|---|
-| 用户提出新功能 / 新模块需求，或问"应该怎么做" | `superpowers:brainstorming` |
-| 启动任何 sprint / 任务之前 | `superpowers:brainstorming` |
-| brainstorming 完成、用户批准设计后 | `superpowers:writing-plans` |
-| 报告 bug / 排查异常 | `superpowers:systematic-debugging` |
-| 有明确 plan 需要执行时 | `superpowers:executing-plans` 或 `superpowers:subagent-driven-development` |
-
-**brainstorming 未完成并获得用户批准，禁止开始实现或写代码。**
-
-## 10. Setup
+## 9. Setup
 
 1. Fill `project.env`.
 2. Run `/project:init` in Claude Code, or run `bash .claude/scripts/init.sh`.
