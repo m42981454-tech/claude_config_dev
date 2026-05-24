@@ -124,9 +124,9 @@ def colorize_git(s):
     s = re.sub(r"(\"[^\"]+" + "…" + r"?\")", DIM + r"\1" + RESET, s)
     return s
 
-def reset_label_from_usage(text):
-    """Return reset time from a HUD weekly remaining-time string."""
-    match = re.search(r"\(([^)]*?)/\s*Week\)", text)
+def reset_label_from_usage(text, pattern=r"\(([^)]*?)/\s*Week\)", fmt="%m/%d %H:%M"):
+    """Return reset time from a HUD remaining-time string."""
+    match = re.search(pattern, text)
     if not match:
         return ""
 
@@ -146,7 +146,7 @@ def reset_label_from_usage(text):
         return ""
 
     reset_at = datetime.now().astimezone() + delta
-    return reset_at.strftime("%m/%d %H:%M")
+    return reset_at.strftime(fmt)
 
 identity, tools_todos, agents = [], [], []
 state = "identity"
@@ -194,9 +194,13 @@ new_usage = []
 for item in usage_lines:
     plain_item = strip_ansi(item)
     if "Week" in plain_item:
-        reset_label = reset_label_from_usage(plain_item)
-        if reset_label:
-            item = item.rstrip() + " →" + reset_label
+        label = reset_label_from_usage(plain_item)
+    elif "Sess" in plain_item:
+        label = reset_label_from_usage(plain_item, r"\(([^)]*?)/\s*\d+h\)", "%H:%M")
+    else:
+        label = ""
+    if label:
+        item = item.rstrip() + " →" + label
     new_usage.append(item)
 usage_lines = new_usage
 
