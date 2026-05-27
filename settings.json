@@ -20,6 +20,7 @@
     ],
     "defaultMode": "bypassPermissions"
   },
+  "model": "sonnet",
   "hooks": {
     "SessionStart": [
       {
@@ -58,7 +59,7 @@
   "enabledPlugins": {
     "superpowers@claude-plugins-official": true,
     "skill-creator@claude-plugins-official": false,
-    "andrej-karpathy-skills@karpathy-skills": true,
+    "andrej-karpathy-skills@karpathy-skills": false,
     "frontend-design@claude-plugins-official": true,
     "context7@claude-plugins-official": true,
     "claude-md-management@claude-plugins-official": true,
@@ -88,6 +89,5 @@
   "autoUpdatesChannel": "latest",
   "skipDangerousModePermissionPrompt": true,
   "theme": "auto",
-  "agentPushNotifEnabled": true,
-  "model": "sonnet"
+  "agentPushNotifEnabled": true
 }
