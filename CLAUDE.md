@@ -116,3 +116,22 @@ Invoke `superpowers:brainstorming` **before any response** when the user message
 
 - Pure factual questions ("what does this function do" / "where is the file")
 - Execution phase when a plan already exists (use `superpowers:executing-plans`)
+
+---
+
+## 8. Subagent Model Hierarchy (体制配置)
+
+When dispatching subagents via the Agent tool, set the `model` parameter according to this hierarchy:
+
+| Role | Model | Scope |
+|---|---|---|
+| **PM** (main session) | fable / opus — whichever the user currently has selected; never downgrade | Orchestration, decisions, review arbitration, merges |
+| **Leader** | `opus` | High-judgment tasks: architecture/design review, final code review before merge, complex root-cause analysis |
+| **Worker — complex** | `sonnet` | Dev/test/ops execution with integration or judgment: multi-file implementation, non-trivial fixes, spec/quality reviews of substantial diffs |
+| **Worker — light** | `haiku` | Investigation & retrieval only: Explore searches, fact lookups, re-review of tiny verified diffs, mechanical single-file edits |
+
+Principles:
+
+- Day-to-day execution runs on **sonnet/haiku**; escalate to **opus (Leader)** only when the task genuinely needs high-level judgment
+- The PM role is the main session itself — subagents do NOT inherit the main session's model; always specify explicitly from this table
+- If a worker reports BLOCKED and the cause is reasoning capacity (not missing context), re-dispatch one tier up (haiku→sonnet→opus)

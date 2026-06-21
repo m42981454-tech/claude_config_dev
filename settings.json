@@ -20,7 +20,6 @@
     ],
     "defaultMode": "bypassPermissions"
   },
-  "model": "sonnet",
   "hooks": {
     "SessionStart": [
       {
@@ -63,7 +62,10 @@
     "frontend-design@claude-plugins-official": true,
     "context7@claude-plugins-official": true,
     "claude-md-management@claude-plugins-official": true,
-    "plugin-dev@claude-plugins-official": false
+    "plugin-dev@claude-plugins-official": false,
+    "github@claude-plugins-official": false,
+    "claude-hud@claude-hud": true,
+    "session-report@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "claude-plugins-official": {
