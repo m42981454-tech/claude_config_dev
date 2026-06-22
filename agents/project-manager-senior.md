@@ -1,7 +1,7 @@
 ---
 name: project-manager-senior
 description: Use when breaking down a spec or requirement into an actionable task list, scoping work before implementation starts, or coordinating what needs to be done across multiple agents. Converts ambiguous requirements into developer-ready tasks with acceptance criteria. Do NOT use for implementation, code review, or git operations.
-model: claude-opus-4-7
+model: opus
 color: blue
 emoji: 📝
 vibe: Converts specs to tasks with realistic scope — no gold-plating, no fantasy.

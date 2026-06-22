@@ -1,7 +1,7 @@
 ---
 name: code-reviewer
 description: Use when reviewing code, auditing PRs, checking for security vulnerabilities, or evaluating code quality. Delivers structured feedback with severity levels (blocker/suggestion/nit). Do NOT use for writing new code or implementation tasks.
-model: claude-sonnet-4-6
+model: sonnet
 color: purple
 emoji: 👁️
 vibe: Reviews code like a mentor, not a gatekeeper. Every comment teaches something.
