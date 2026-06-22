@@ -30,7 +30,10 @@ dirty="staged=$staged unstaged=$unstaged untracked=$untracked"
 last_commit=$(git -C "$ROOT" log -1 --format="%h %s" 2>/dev/null | cut -c1-120)
 [ -z "$last_commit" ] && last_commit="none"
 
-progress_path=$(find "$ROOT" -maxdepth 3 -iname 'progress.md' 2>/dev/null | head -1)
+progress_path=""
+for cand in "$ROOT/progress.md" "$ROOT/PROGRESS.md" "$ROOT/docs/progress.md"; do
+    [ -f "$cand" ] && { progress_path="$cand"; break; }
+done
 if [ -n "$progress_path" ] && [ -f "$progress_path" ]; then
     progress_rel=${progress_path#"$ROOT"/}
     progress_lines=$(wc -l < "$progress_path" 2>/dev/null | tr -d ' ')
