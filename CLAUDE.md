@@ -1,7 +1,7 @@
 # Claude Code Global Baseline
 
 > Cross-project baseline. Project-level `CLAUDE.md` may override or extend these rules.
-> 完整原文（含全部示例短语，2026-06-21 之前版本）见 `~/.claude/archive/claude-md-full-v1-20260621.md`。
+> Full original (with all example phrases, pre-2026-06-21 version) see `~/.claude/archive/claude-md-full-v1-20260621.md`.
 
 ## 1. Communication Language
 
@@ -56,7 +56,7 @@ Non-negotiable; takes priority over a skill's own internal judgment.
 
 | Trigger condition | Must invoke | Hard gate |
 |---|---|---|
-| New feature/module/system proposed; "how should we approach"/design discussion; starting any sprint/task; "brainstorm"/"讨论"/"what do you think" | `superpowers:brainstorming` | No code before brainstorming complete + design approved |
+| New feature/module/system proposed; "how should we approach"/design discussion; starting any sprint/task; "brainstorm"/"discuss"/"what do you think" | `superpowers:brainstorming` | No code before brainstorming complete + design approved |
 | Brainstorming approved; or user says "write a plan"/"make a plan" | `superpowers:writing-plans` | — |
 | Bug / test failure / unexpected behavior reported | `superpowers:systematic-debugging` | No guess-and-fix before following the debugging process |
 | Before declaring any task "done"; "is it done?"/"ready to merge?" | `superpowers:verification-before-completion` | — |
@@ -68,11 +68,14 @@ When dispatching subagents via the Agent tool, set the `model` parameter accordi
 
 | Role | Model | Scope |
 |---|---|---|
-| **PM** (main session) | fable / opus — whichever the user currently has selected; never downgrade | Orchestration, decisions, review arbitration, merges |
-| **Leader** | `opus` | High-judgment tasks: architecture/design review, final code review before merge, complex root-cause analysis |
-| **Worker — complex** | `sonnet` | Dev/test/ops execution with integration or judgment: multi-file implementation, non-trivial fixes, spec/quality reviews of substantial diffs |
-| **Worker — light** | `haiku` | Investigation & retrieval only: Explore searches, fact lookups, re-review of tiny verified diffs, mechanical single-file edits |
+| **PM** (main session) | fable / opus — whichever the user currently has selected; never downgrade | **Do as little as possible**: only orchestration, task dispatch, final merge decisions. Always delegate verification/review/investigation/implementation — don't keep opus working. Allocate flexibly to minimize token cost |
+| **Leader / acceptance** | `sonnet` (default) → `opus` (fallback only) | **Default to sonnet**: architecture/design review, code review, **acceptance, quality gates**, root-cause analysis. Escalate to opus only for high-stakes judgment that sonnet Leader clearly can't handle (major architecture decisions, final-review disagreements, complex root-cause) |
+| **Worker — complex** | `sonnet` | Dev/test/ops execution with integration or judgment: multi-file implementation, non-trivial fixes, spec/quality reviews of substantial diffs. **Investigation/exploration also defaults here** (codebase exploration, Explore searches, judgment-requiring retrieval) — investigation quality matters more than cost |
+| **Worker — light** | `haiku` | ONLY truly trivial mechanical work: finding files, grepping content, mechanical single-file read/edit, re-review of tiny already-verified diffs. Escalate to sonnet once cross-file synthesis or judgment is needed |
 
-- Day-to-day execution runs on **sonnet/haiku**; escalate to **opus (Leader)** only when the task genuinely needs high-level judgment
+- Day-to-day execution AND acceptance/review run on **sonnet/haiku**; **opus is a fallback only when sonnet clearly can't cope**. Default assumption is that sonnet suffices — dispatch sonnet first, escalate to opus only if it isn't enough
+- Goal: minimize opus main-session token usage. Delegate everything delegable (implementation/investigation/acceptance/review/screenshot judgment) — the main thread receives text summaries only
+- **Pre-action gate** (run before ANY non-read-only Bash / Edit / deploy / investigation): (1) Is this strict-opus — a *decision*, *subagent-orchestration judgment* (decomposition / prompt-writing / arbitrating results), or something genuinely needing a high-level model? If NO → delegate. (2) Is shipping the needed context to a subagent cheaper than handling it inline? If YES → delegate to sonnet/haiku; if NO (e.g. it would require dumping a long conversation) → keep inline. Optimize total token cost, not dogmatic delegation.
+- Conversation introspection/reflection may ALSO run on a **sonnet** leader (subject to the context-length check above), not just verification/review/investigation. opus is reserved for genuine high-judgment work — never for routine reflection or zero-context ops like deploys.
 - The PM role is the main session itself — subagents do NOT inherit the main session's model; always specify explicitly from this table
 - If a worker reports BLOCKED and the cause is reasoning capacity (not missing context), re-dispatch one tier up (haiku→sonnet→opus)
