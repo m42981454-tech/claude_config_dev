@@ -58,9 +58,6 @@ PYTHON_BIN=$(resolve_cmd "${CLAUDE_STATUS_PYTHON:-}" "/c/Users/dev002/miniconda3
   PYTHON_BIN=$(resolve_cmd "${CLAUDE_STATUS_PYTHON:-}" "/c/Users/dev002/miniconda3/python" "python") || exit 0
 
 # Run claude-hud and let Python regroup
-export CWD_LABEL
-CWD_LABEL="$(basename "$PWD")"
-
 export GIT_INFO
 GIT_INFO=""
 if git -C "$PWD" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
@@ -95,6 +92,18 @@ fi
 
 export TRANSCRIPT_PATH
 TRANSCRIPT_PATH=$(echo "$input" | jq -r '.transcript_path // ""' 2>/dev/null || echo "")
+
+# Thinking/effort state lives in settings.json (static config), not in the
+# stdin hook payload — read it directly so the statusline can show it.
+export THINKING_ENABLED EFFORT_LEVEL
+THINKING_ENABLED="true"
+EFFORT_LEVEL=""
+SETTINGS_FILE="${CLAUDE_CONFIG_DIR:-$HOME/.claude}/settings.json"
+if [ -f "$SETTINGS_FILE" ]; then
+  _thinking=$(jq -r '.alwaysThinkingEnabled' "$SETTINGS_FILE" 2>/dev/null)
+  [ "$_thinking" = "false" ] && THINKING_ENABLED="false"
+  EFFORT_LEVEL=$(jq -r '.effortLevel // ""' "$SETTINGS_FILE" 2>/dev/null)
+fi
 
 export PYTHONIOENCODING=utf-8
 export PYTHONUTF8=1

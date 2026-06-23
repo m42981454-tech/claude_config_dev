@@ -1,25 +1,45 @@
 {
-  "language": "zh",
-  "lineLayout": "compact",
+  "language": "en",
+  "lineLayout": "expanded",
   "showSeparators": false,
+  "pathLevels": 50,
   "display": {
     "showTools": true,
     "showAgents": true,
     "showTodos": true,
-    "showProject": false,
+    "showProject": true,
     "showConfigCounts": false,
     "showTokenBreakdown": false,
-    "showSpeed": false,
+    "showSpeed": true,
     "showUsage": true,
     "usageBarEnabled": true,
+    "usageCompact": true,
+    "timeFormat": "absolute",
+    "showResetLabel": false,
     "showDuration": true,
     "showSessionName": true,
-    "showSessionTokens": true
+    "showSessionTokens": true,
+    "showPromptCache": false,
+    "showEffortLevel": true
   },
   "gitStatus": {
     "enabled": true,
     "showDirty": true,
     "showAheadBehind": true,
     "showFileStats": false
+  },
+  "colors": {
+    "model": "#2DD4BF",
+    "project": "#5EEAD4",
+    "git": "#14B8A6",
+    "gitBranch": "#3B82F6",
+    "usage": "#34D399",
+    "usageWarning": "#FBBF24",
+    "critical": "#F87171",
+    "context": "#6EE7B7",
+    "label": "#94A3B8",
+    "custom": "#5EEAD4",
+    "barFilled": "▰",
+    "barEmpty": "▱"
   }
 }

@@ -64,7 +64,8 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "bash \"${CLAUDE_CONFIG_DIR:-$HOME/.claude}/scripts/statusline-lines.sh\""
+    "command": "bash \"${CLAUDE_CONFIG_DIR:-$HOME/.claude}/scripts/statusline-lines.sh\"",
+    "refreshInterval": 2
   },
   "enabledPlugins": {
     "superpowers@claude-plugins-official": true,
@@ -98,7 +99,7 @@
       }
     }
   },
-  "effortLevel": "medium",
+  "effortLevel": "high",
   "autoUpdatesChannel": "latest",
   "skipDangerousModePermissionPrompt": true,
   "theme": "auto",

@@ -149,42 +149,43 @@ def reset_label_from_usage(text, pattern=r"\(([^)]*?)/\s*Week\)", fmt="%m/%d %H:
     return reset_at.strftime(fmt)
 
 identity, tools_todos, agents = [], [], []
-state = "identity"
-last_bucket = None
 
-cwd_label = os.environ.get("CWD_LABEL", "")
-if cwd_label:
-    identity.append(f"{BOLD}{CYAN}{cwd_label}{RESET}")
-
+# Classify every line by content, not by "have we seen an activity line yet" —
+# claude-hud doesn't guarantee identity-type lines (e.g. the Tokens line) come
+# before tools/agents activity lines in its output order. The old state-machine
+# version assumed identity-then-activity ordering and silently swallowed any
+# later identity line (like Tokens) into the previous activity entry once that
+# assumption broke.
 for raw_line in sys.stdin.read().splitlines():
     plain = strip_ansi(raw_line).lstrip()
     if not plain:
         continue
     starts_activity = plain[:1] in ("◐", "✓", "▸")  # ◐ ✓ ▸
     if starts_activity:
-        state = "activity"
         if MAGENTA in raw_line:
             agents.append(raw_line)
-            last_bucket = "agents"
         else:
             tools_todos.append(raw_line)
-            last_bucket = "tools_todos"
-    elif state == "identity":
-        identity.append(raw_line)
     else:
-        if last_bucket == "agents" and agents:
-            agents[-1] += " " + raw_line.strip()
-        elif tools_todos:
-            tools_todos[-1] += " " + raw_line.strip()
-        else:
-            identity.append(raw_line)
+        identity.append(raw_line)
 
 tok_lines, usage_lines, identity_main = [], [], []
 for item in identity:
     plain_item = strip_ansi(item)
-    if "tok:" in plain_item or "⏱" in plain_item:
+    # The project/model line (path + git:(...) + whatever else claude-hud bakes
+    # into it, e.g. duration's clock emoji) must always land on line 1 — checked
+    # before the tok/usage heuristics below, which would otherwise misroute it
+    # to line 2 just because it happens to also contain "tok:"/"⏱".
+    if "git:(" in plain_item or plain_item.startswith("["):
+        identity_main.append(item)
+    elif "tok:" in plain_item or "Tokens" in plain_item or "令牌" in plain_item or "⏱" in plain_item:
         tok_lines.append(item)
-    elif "用量" in plain_item or "本周" in plain_item or "█" in plain_item or "░" in plain_item:
+    elif ("Context" in plain_item or "上下文" in plain_item or "5h:" in plain_item
+          or "7d:" in plain_item or "用量" in plain_item or "本周" in plain_item
+          or "█" in plain_item or "░" in plain_item or "▰" in plain_item or "▱" in plain_item):
+        # Matches both the legacy default bar glyphs (█/░) and this config's
+        # custom barFilled/barEmpty override (▰/▱) — a custom bar style used to
+        # silently fall through to identity_main since neither glyph matched.
         usage_item = item.replace("用量", "Sess").replace("本周", "Week")
         usage_lines.append(usage_item)
     else:
@@ -211,11 +212,62 @@ if git_suffix:
             identity_main[i] = item.rstrip() + " " + git_suffix
             break
 
+# Thinking state: read from settings.json by statusline-lines.sh (not part
+# of the stdin hook payload). claude-hud itself already renders effort
+# (symbol + level, e.g. "◔ medium") INSIDE the model bracket when the hook
+# payload provides an effort field — so don't add a second, separate effort
+# label after the bracket (that was duplicating it, e.g.
+# "[Sonnet 4.6 ◔ medium] thinking,medium"). Instead splice "thinking," in
+# front of whatever word is already there, inside the same bracket:
+# "[Sonnet 4.6 ◔ thinking,medium]". If claude-hud didn't render an effort
+# bit this turn (no native symbol found), fall back to settings.json's
+# EFFORT_LEVEL so the bracket still ends up with "[Sonnet 4.6 thinking,medium]".
+if os.environ.get("THINKING_ENABLED", "true") != "false":
+    _effort_level = os.environ.get("EFFORT_LEVEL", "").strip().lower()
+    NATIVE_EFFORT_RE = re.compile(r"([○◔◑◕●])(\s+)(\w+)(\])")
+    for i, item in enumerate(identity_main):
+        if not strip_ansi(item).startswith("["):
+            continue
+        m = NATIVE_EFFORT_RE.search(item)
+        if m:
+            identity_main[i] = item[:m.start(3)] + "thinking," + item[m.start(3):]
+        else:
+            insert = "thinking" + ("," + _effort_level if _effort_level else "")
+            close_idx = item.find("]")
+            if close_idx != -1:
+                identity_main[i] = item[:close_idx] + " " + insert + item[close_idx:]
+        break
+
+# Pull the duration (⏱️ Xh Ym) and speed (out: X.X tok/s) fields out of
+# whichever identity_main line they're baked into (claude-hud always bundles
+# both into the same project/model line) and move them to the end of line 2
+# instead, per request — duration first, then speed.
+DURATION_RE = re.compile(r"\s*│\s*((?:\x1b\[[0-9;]*m)?⏱️\s*\d+[a-zA-Z]+(?:\s+\d+[a-zA-Z]+)*(?:\x1b\[0m)?)")
+SPEED_RE = re.compile(r"\s*│\s*((?:\x1b\[[0-9;]*m)?[^\x1b│]*?tok/s(?:\x1b\[0m)?)")
+duration_part = None
+speed_part = None
+for i, item in enumerate(identity_main):
+    m = DURATION_RE.search(item)
+    if m:
+        duration_part = m.group(1).rstrip()
+        identity_main[i] = item[:m.start()] + item[m.end():]
+        break
+for i, item in enumerate(identity_main):
+    m = SPEED_RE.search(item)
+    if m:
+        speed_part = m.group(1).rstrip()
+        identity_main[i] = item[:m.start()] + item[m.end():]
+        break
+
 out = []
 if identity_main:
     out.append(SEP.join(identity_main))
 
 line2_parts = usage_lines + tok_lines
+if duration_part:
+    line2_parts.append(duration_part)
+if speed_part:
+    line2_parts.append(speed_part)
 if line2_parts: out.append(SEP.join(line2_parts))
 
 line3_parts = []
