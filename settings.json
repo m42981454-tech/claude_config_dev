@@ -65,7 +65,7 @@
   "statusLine": {
     "type": "command",
     "command": "bash \"${CLAUDE_CONFIG_DIR:-$HOME/.claude}/scripts/statusline-lines.sh\"",
-    "refreshInterval": 2
+    "refreshInterval": 10
   },
   "enabledPlugins": {
     "superpowers@claude-plugins-official": true,
