@@ -299,10 +299,13 @@ fi
 
 hdr ".githooks/"
 copy_dir_missing "$TMPL/.githooks" "$TARGET/.githooks"
-# pre-commit 含 [MAIN_BRANCH] 占位符，与 init.sh 对齐做替换
-if [ -f "$TARGET/.githooks/pre-commit" ]; then
-  [ "$DRY_RUN" != "1" ] && sub_placeholders "$TARGET/.githooks/pre-commit"
-fi
+# 只替换本次新复制的 pre-commit，保留用户已有 hook 的内容。
+for copied in "${COPIED[@]}"; do
+  if [ "$copied" = "$TARGET/.githooks/pre-commit" ] && [ "$DRY_RUN" != "1" ]; then
+    sub_placeholders "$copied"
+    break
+  fi
+done
 if [ -f "$TARGET/.githooks/install.sh" ]; then
   if [ "$DRY_RUN" != "1" ]; then
     (cd "$TARGET" && bash .githooks/install.sh 2>/dev/null) && ok "hooks installed (core.hooksPath=.githooks)"

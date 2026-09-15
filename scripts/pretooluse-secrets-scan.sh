@@ -23,7 +23,7 @@ patterns=(
 for p in "${patterns[@]}"; do
   if printf '%s' "$content" | grep -qiE -- "$p"; then
     cat <<JSON
-{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"ask","permissionDecisionReason":"检测到可能的密钥/凭据写入（匹配规则: $p），请确认后再继续。"}}
+{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"ask","permissionDecisionReason":"检测到可能的密钥/凭据写入，请确认后再继续。"}}
 JSON
     exit 0
   fi
