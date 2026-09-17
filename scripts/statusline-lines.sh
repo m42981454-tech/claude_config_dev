@@ -53,9 +53,33 @@ if [ -z "$plugin_dir" ] || [ ! -f "${plugin_dir}dist/index.js" ]; then
   exit 0
 fi
 
+# Prefer a real interpreter to whatever `python3` is first on PATH. On this host
+# that is the pyenv-win shim, whose `pyenv exec $(basename "$0") "$@"` drops the
+# command name whenever basename prints nothing; the renderer path then becomes
+# the command, and cmd opens it by file association ("Open with" dialog).
+real_python() {
+  local root="$HOME/.pyenv/pyenv-win" version candidate
+  if [ -f "$root/version" ]; then
+    IFS= read -r version <"$root/version"
+    version="${version%$'\r'}"   # pyenv-win writes CRLF
+    candidate="$root/versions/$version/python.exe"
+    if [ -n "$version" ] && [ -x "$candidate" ]; then
+      printf '%s' "$candidate"
+      return 0
+    fi
+  fi
+  candidate="$HOME/miniconda3/python.exe"
+  if [ -x "$candidate" ]; then
+    printf '%s' "$candidate"
+    return 0
+  fi
+  return 1
+}
+
 NODE_BIN=$(resolve_cmd "${CLAUDE_STATUS_NODE:-}" "/c/nvm4w/nodejs/node" "node") || exit 0
-PYTHON_BIN=$(resolve_cmd "${CLAUDE_STATUS_PYTHON:-}" "/c/Users/dev002/miniconda3/python" "python3") || \
-  PYTHON_BIN=$(resolve_cmd "${CLAUDE_STATUS_PYTHON:-}" "/c/Users/dev002/miniconda3/python" "python") || exit 0
+REAL_PYTHON=$(real_python)
+PYTHON_BIN=$(resolve_cmd "${CLAUDE_STATUS_PYTHON:-}" "$REAL_PYTHON" "python3") || \
+  PYTHON_BIN=$(resolve_cmd "${CLAUDE_STATUS_PYTHON:-}" "$REAL_PYTHON" "python") || exit 0
 
 # Run claude-hud and let Python regroup
 export GIT_INFO
